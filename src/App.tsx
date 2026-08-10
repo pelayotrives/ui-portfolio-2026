@@ -2,7 +2,7 @@
  * macrostructure: Workbench · genre: editorial-playful · theme: Studio
  * audience: recruiters, studios and agencies · use: visual selection + contact
  */
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import Lenis from 'lenis'
 import './App.css'
@@ -10,19 +10,17 @@ import './App.css'
 type Project = {
   number: string
   title: string
-  kind: string
   year: string
-  palette: string
   note: string
   className: string
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Noma', kind: 'Digital product', year: '2025', palette: 'lime', note: 'A digital space for returning to what matters.', className: 'project--noma' },
-  { number: '02', title: 'Morrow', kind: 'Brand system', year: '2025', palette: 'apricot', note: 'An identity that moves with the conversation.', className: 'project--morrow' },
-  { number: '03', title: 'Rastro', kind: 'Editorial experience', year: '2024', palette: 'blue', note: 'Archive, memory and visual culture in layers.', className: 'project--rastro' },
-  { number: '04', title: 'Vela', kind: 'Mobile experience', year: '2024', palette: 'red', note: 'Small rituals for making larger days count.', className: 'project--vela' },
-  { number: '05', title: 'Punto', kind: 'Campaign direction', year: '2023', palette: 'violet', note: 'A pause can be a decision, too.', className: 'project--punto' },
+  { number: '01', title: 'Octalea', year: '2025', note: 'A digital space for returning to what matters.', className: 'project--octalea' },
+  { number: '02', title: 'Dealium', year: '2025', note: 'An identity that moves with the conversation.', className: 'project--dealium' },
+  { number: '03', title: 'Accra', year: '2024', note: 'Archive, memory and visual culture in layers.', className: 'project--accra' },
+  { number: '04', title: 'Sueños de Colores', year: '2024', note: 'Small rituals for making larger days count.', className: 'project--suenos' },
+  { number: '05', title: 'Floddets', year: '2023', note: 'A pause can be a decision, too.', className: 'project--floddets' },
 ]
 
 function ProjectArtwork({ project }: { project: Project }) {
@@ -39,7 +37,6 @@ function ProjectArtwork({ project }: { project: Project }) {
 }
 
 function App() {
-  const [filter, setFilter] = useState('All work')
   const pageRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -58,13 +55,51 @@ function App() {
         y: 40, opacity: 0, duration: 0.9, stagger: 0.1, delay: 0.35, ease: 'power3.out',
       })
     }, pageRef)
-    return () => { cancelAnimationFrame(frame); lenis.destroy(); context.revert() }
-  }, [])
 
-  const visibleProjects = filter === 'All work' ? projects : projects.filter((project) => project.kind === filter)
+    const cursor = document.querySelector<HTMLElement>('.cursor')
+    const cursorTrails = gsap.utils.toArray<HTMLElement>('.cursor-trail')
+    const hasPointer = window.matchMedia('(pointer: fine)').matches
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    let onMove: ((event: PointerEvent) => void) | undefined
+    let onOver: ((event: PointerEvent) => void) | undefined
+
+    if (cursor && hasPointer && !prefersReducedMotion) {
+      const moveX = gsap.quickTo(cursor, 'x', { duration: 0.24, ease: 'power3.out' })
+      const moveY = gsap.quickTo(cursor, 'y', { duration: 0.24, ease: 'power3.out' })
+      onMove = (event: PointerEvent) => {
+        moveX(event.clientX)
+        moveY(event.clientY)
+        cursorTrails.forEach((trail, index) => {
+          gsap.to(trail, {
+            x: event.clientX,
+            y: event.clientY,
+            duration: 0.22 + index * 0.045,
+            ease: 'power3.out',
+            overwrite: 'auto',
+          })
+        })
+      }
+      onOver = (event: PointerEvent) => {
+        const target = event.target as HTMLElement
+        cursor.classList.toggle('cursor--interactive', Boolean(target.closest('a, button')))
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerover', onOver)
+    }
+
+    return () => {
+      cancelAnimationFrame(frame)
+      lenis.destroy()
+      context.revert()
+      if (onMove) window.removeEventListener('pointermove', onMove)
+      if (onOver) window.removeEventListener('pointerover', onOver)
+    }
+  }, [])
 
   return (
     <div className="site-shell" ref={pageRef}>
+      <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
+      <div className="cursor" aria-hidden="true"><span /><b>✳</b></div>
       <header className="site-nav">
         <a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a>
         <p className="nav-note">UI designer<br />based in Madrid / Kyoto</p>
@@ -89,17 +124,12 @@ function App() {
             <div><span className="section-index">01</span><h2 id="work-title">A few things<br />I’ve made.</h2></div>
             <p>Five case studies in product thinking, visual systems and the joy of a well-placed detail.</p>
           </div>
-          <div className="filters" aria-label="Filter projects">
-            {['All work', 'Digital product', 'Brand system', 'Editorial experience'].map((item) => (
-              <button key={item} className={filter === item ? 'filter filter--active' : 'filter'} onClick={() => setFilter(item)}>{item}</button>
-            ))}
-          </div>
           <div className="project-grid">
-            {visibleProjects.map((project, index) => (
+            {projects.map((project, index) => (
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
                 <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`}>
                   <ProjectArtwork project={project} />
-                  <div className="project-card__meta"><span>{project.number} / {project.kind}</span><span>{project.year} <b>↗</b></span></div>
+                  <div className="project-card__meta"><span>{project.number} / Selected work</span><span>{project.year} <b>↗</b></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
                 </a>
               </article>
