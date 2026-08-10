@@ -19,7 +19,6 @@ pnpm dev
 
 The local development server is usually available at `http://localhost:5173`.
 
-
 ## Adding projects
 
 Project content is defined in `src/App.tsx`. Update the project list and its matching artwork class in `src/App.css`. Replace the CSS artwork with real project imagery when the final assets are available.

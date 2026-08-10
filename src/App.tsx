@@ -4,8 +4,11 @@
  */
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import './App.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 type Project = {
   number: string
@@ -41,18 +44,20 @@ function App() {
 
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
-    let frame = 0
-    const raf = (time: number) => {
-      lenis.raf(time)
-      frame = requestAnimationFrame(raf)
-    }
-    frame = requestAnimationFrame(raf)
+    const updateLenis = (time: number) => lenis.raf(time * 1000)
+    lenis.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add(updateLenis)
+    gsap.ticker.lagSmoothing(0)
     const context = gsap.context(() => {
-      gsap.from('.site-nav, .hero__eyebrow, .hero h1, .hero__aside, .hero__scroll', {
+      gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
       })
+      gsap.from('.hero__title-line', {
+        yPercent: 110, opacity: 0, filter: 'blur(14px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
+      })
       gsap.from('.project-card', {
-        y: 40, opacity: 0, duration: 0.9, stagger: 0.1, delay: 0.35, ease: 'power3.out',
+        y: 42, opacity: 0, filter: 'blur(12px)', duration: 0.85, stagger: 0.12, ease: 'power3.out',
+        scrollTrigger: { trigger: '.project-grid', start: 'top 82%', once: true },
       })
     }, pageRef)
 
@@ -88,7 +93,8 @@ function App() {
     }
 
     return () => {
-      cancelAnimationFrame(frame)
+      gsap.ticker.remove(updateLenis)
+      lenis.off('scroll', ScrollTrigger.update)
       lenis.destroy()
       context.revert()
       if (onMove) window.removeEventListener('pointermove', onMove)
@@ -113,7 +119,7 @@ function App() {
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero__eyebrow"><span className="dot" /> Portfolio / 2026</div>
-          <h1 id="hero-title">Interfaces with<br /><em>something</em> to say.</h1>
+          <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
           <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences — with a soft spot for the strange bits.</p>
           <a className="hero__scroll" href="#work"><span>Scroll to explore</span><span className="arrow">↓</span></a>
           <div className="hero__scribble" aria-hidden="true">↝</div>
@@ -139,7 +145,7 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><a className="text-link" href="https://linkedin.com/pelayo-trives-pozuelo">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__item"><span className="timeline__date">Now</span><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s programme focused on Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2022</span><div><h3>Ironhack</h3><p>Web Development Bootcamp</p></div></div><div className="timeline__item"><span className="timeline__date">2021</span><div><h3>Bindin</h3><p>Brand identity, multimedia content and web structure for an educational marketplace.</p></div></div><div className="timeline__item"><span className="timeline__date">2017—2024</span><div><h3>Spanish Red Cross</h3><p>Volunteer developer focused on content creation and web maintenance.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
