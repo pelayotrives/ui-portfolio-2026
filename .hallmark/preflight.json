@@ -1,0 +1,9 @@
+{
+  "date": "2026-08-10",
+  "framework": "Vite + React 19 + TypeScript",
+  "fontStack": "starter system stack replaced with Playfair Display + Manrope + DM Mono",
+  "palette": "starter palette replaced with Studio OKLCH tokens",
+  "motion": "GSAP + Lenis installed",
+  "spacing": "4pt-derived semantic tokens",
+  "preserved": []
+}
