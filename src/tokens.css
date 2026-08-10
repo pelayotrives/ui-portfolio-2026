@@ -1,6 +1,6 @@
 /* Hallmark · token system · Studio */
 :root {
-  --color-paper: oklch(97% .018 92); --color-ink: oklch(18% .025 75); --color-muted: oklch(48% .025 75); --color-line: oklch(82% .025 85); --color-accent: oklch(81% .21 124); --color-accent-deep: oklch(56% .16 130); --color-accent-soft: oklch(81% .21 124 / .18); --color-acid: oklch(90% .19 112); --color-apricot: oklch(83% .13 57); --color-sky: oklch(82% .12 223); --color-cobalt: oklch(33% .14 261); --color-coral: oklch(75% .17 28); --color-lilac: oklch(81% .12 311);
+  --color-paper: #fffcf2; --color-ink: #252422; --color-muted: #403d39; --color-line: #ccc5b9; --color-accent: #eb5e28; --color-accent-deep: #eb5e28; --color-accent-soft: rgb(235 94 40 / .18); --color-acid: #fffcf2; --color-apricot: #ccc5b9; --color-sky: #ccc5b9; --color-cobalt: #403d39; --color-coral: #eb5e28; --color-lilac: #ccc5b9;
   --font-display: 'Playfair Display', Georgia, serif; --font-body: 'Manrope', sans-serif; --font-mono: 'DM Mono', monospace;
   --text-display: clamp(4.5rem, 12vw, 11.5rem); --text-section: clamp(3.6rem, 7vw, 7.5rem); --text-card: clamp(2rem, 4vw, 4rem); --text-body: 16px; --text-micro: 11px/1.3 var(--font-mono);
   --space-lg: clamp(1.1rem, 4vw, 4rem); --rule-hairline: 1px solid var(--color-line); --radius-pill: 999px; --ease-out: cubic-bezier(.22, 1, .36, 1); --dur-fast: 240ms;

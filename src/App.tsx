@@ -66,7 +66,7 @@ function App() {
   return (
     <div className="site-shell" ref={pageRef}>
       <header className="site-nav">
-        <a className="wordmark" href="#top" aria-label="Pelayo Trives, volver al inicio">PR<span>.</span></a>
+        <a className="wordmark" href="#top" aria-label="Pelayo Trives, volver al inicio">PT<span>.</span></a>
         <p className="nav-note">UI designer<br />based in Madrid / Kyoto</p>
         <nav aria-label="Main navigation">
           <a href="#work">Selected work</a>
