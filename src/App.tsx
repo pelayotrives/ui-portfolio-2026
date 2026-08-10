@@ -66,8 +66,8 @@ function App() {
   return (
     <div className="site-shell" ref={pageRef}>
       <header className="site-nav">
-        <a className="wordmark" href="#top" aria-label="Pelayot Rives, volver al inicio">PR<span>.</span></a>
-        <p className="nav-note">UI designer<br />based in Madrid / Tokyo</p>
+        <a className="wordmark" href="#top" aria-label="Pelayo Trives, volver al inicio">PR<span>.</span></a>
+        <p className="nav-note">UI designer<br />based in Madrid / Kyoto</p>
         <nav aria-label="Main navigation">
           <a href="#work">Selected work</a>
           <a href="#about">About</a>
@@ -109,13 +109,13 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayot<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><a className="text-link" href="mailto:hello@pelayotrives.com">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><a className="text-link" href="https://linkedin.com/pelayo-trives-pozuelo">More about me <span>↗</span></a></div>
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
-        <section className="contact-section" aria-labelledby="contact-title"><p className="contact-kicker">Have a good project?</p><h2 id="contact-title">Let’s make<br /><em>the right thing.</em></h2><a className="contact-button" href="mailto:hello@pelayotrives.com">Start a conversation <span>↗</span></a></section>
+        <section className="contact-section" aria-labelledby="contact-title"><p className="contact-kicker">Have a good project?</p><h2 id="contact-title">Let’s make<br /><em>the right thing.</em></h2><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
-      <footer><span>© 2026 Pelayot Rives</span><span>Designed in Figma, built with care.</span><a href="#top">Back to top ↑</a></footer>
+      <footer><span>© 2026 Pelayo Trives</span><span>Designed in Figma, built with care.</span><a href="#top">Back to top ↑</a></footer>
     </div>
   )
 }
