@@ -1,0 +1,7 @@
+/* TEAM */
+Designer: Pelayo Trives
+Role: UI Designer
+Site: https://pelayotrives.github.io/ui-portfolio-2026/
+
+/* SITE */
+Built with React, Vite, GSAP and Lenis.

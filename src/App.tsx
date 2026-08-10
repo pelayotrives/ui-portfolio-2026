@@ -18,11 +18,11 @@ type Project = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Noma', kind: 'Digital product', year: '2025', palette: 'lime', note: 'Un espacio digital para volver a lo esencial.', className: 'project--noma' },
-  { number: '02', title: 'Morrow', kind: 'Brand system', year: '2025', palette: 'apricot', note: 'Una identidad que se mueve con la conversación.', className: 'project--morrow' },
-  { number: '03', title: 'Rastro', kind: 'Editorial experience', year: '2024', palette: 'blue', note: 'Archivo, memoria y cultura visual en capas.', className: 'project--rastro' },
-  { number: '04', title: 'Vela', kind: 'Mobile experience', year: '2024', palette: 'red', note: 'Pequeños rituales para grandes días.', className: 'project--vela' },
-  { number: '05', title: 'Punto', kind: 'Campaign direction', year: '2023', palette: 'violet', note: 'La pausa también puede ser una decisión.', className: 'project--punto' },
+  { number: '01', title: 'Noma', kind: 'Digital product', year: '2025', palette: 'lime', note: 'A digital space for returning to what matters.', className: 'project--noma' },
+  { number: '02', title: 'Morrow', kind: 'Brand system', year: '2025', palette: 'apricot', note: 'An identity that moves with the conversation.', className: 'project--morrow' },
+  { number: '03', title: 'Rastro', kind: 'Editorial experience', year: '2024', palette: 'blue', note: 'Archive, memory and visual culture in layers.', className: 'project--rastro' },
+  { number: '04', title: 'Vela', kind: 'Mobile experience', year: '2024', palette: 'red', note: 'Small rituals for making larger days count.', className: 'project--vela' },
+  { number: '05', title: 'Punto', kind: 'Campaign direction', year: '2023', palette: 'violet', note: 'A pause can be a decision, too.', className: 'project--punto' },
 ]
 
 function ProjectArtwork({ project }: { project: Project }) {
@@ -66,7 +66,7 @@ function App() {
   return (
     <div className="site-shell" ref={pageRef}>
       <header className="site-nav">
-        <a className="wordmark" href="#top" aria-label="Pelayo Trives, volver al inicio">PT<span>.</span></a>
+        <a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a>
         <p className="nav-note">UI designer<br />based in Madrid / Kyoto</p>
         <nav aria-label="Main navigation">
           <a href="#work">Selected work</a>
@@ -97,7 +97,7 @@ function App() {
           <div className="project-grid">
             {visibleProjects.map((project, index) => (
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
-                <a href={`#project-${project.number}`} className="project-card__link" aria-label={`Ver caso de estudio ${project.title}`}>
+                <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`}>
                   <ProjectArtwork project={project} />
                   <div className="project-card__meta"><span>{project.number} / {project.kind}</span><span>{project.year} <b>↗</b></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
