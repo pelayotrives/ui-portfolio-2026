@@ -45,6 +45,7 @@ function App() {
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
     const updateLenis = (time: number) => lenis.raf(time * 1000)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nav = document.querySelector<HTMLElement>('.site-nav')
     const handleScroll = ({ scroll }: { scroll: number }) => nav?.classList.toggle('site-nav--scrolled', scroll > 18)
     lenis.on('scroll', ScrollTrigger.update)
@@ -52,6 +53,18 @@ function App() {
     gsap.ticker.add(updateLenis)
     gsap.ticker.lagSmoothing(0)
     const context = gsap.context(() => {
+      const loader = document.querySelector<HTMLElement>('.intro-loader')
+      const messages = gsap.utils.toArray<HTMLElement>('.intro-loader__message')
+      if (loader && !prefersReducedMotion) {
+        const loaderTimeline = gsap.timeline({ onComplete: () => loader.setAttribute('aria-hidden', 'true') })
+        messages.forEach((message, index) => {
+          loaderTimeline
+            .fromTo(message, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: 'power3.out' }, index === 0 ? 0.15 : '+=0.18')
+            .to(message, { autoAlpha: 0, y: -10, duration: 0.28, ease: 'power2.in' }, '+=0.58')
+            .to('.intro-loader__progress', { scaleX: (index + 1) / messages.length, duration: 0.65, ease: 'power2.inOut' }, '<-0.12')
+        })
+        loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08')
+      } else if (loader) gsap.set(loader, { autoAlpha: 0 })
       gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
       })
@@ -73,13 +86,11 @@ function App() {
           .to(dot, { scale: 1, rotation: 0, duration: 0.58, ease: 'elastic.out(1, 0.45)' })
       })
       gsap.to('.contact-star', { rotation: 360, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
-      ScrollTrigger.create({
-        trigger: '.contact-section',
-        start: 'top 78px',
-        end: 'bottom top',
-        onEnter: () => document.querySelector('.contact-section')?.classList.add('contact-section--immersive'),
-        onEnterBack: () => document.querySelector('.contact-section')?.classList.add('contact-section--immersive'),
-        onLeaveBack: () => document.querySelector('.contact-section')?.classList.remove('contact-section--immersive'),
+      gsap.fromTo('.contact-section', {
+        '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px',
+      }, {
+        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px',
+        ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 78px', end: 'top top', scrub: 1, invalidateOnRefresh: true },
       })
     }, pageRef)
 
@@ -90,7 +101,6 @@ function App() {
     const contactSection = document.querySelector<HTMLElement>('.contact-section')
     const contactTitle = document.querySelector<HTMLElement>('.contact-title-wrap')
     const hasPointer = window.matchMedia('(pointer: fine)').matches
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let onMove: ((event: PointerEvent) => void) | undefined
     let onOver: ((event: PointerEvent) => void) | undefined
     let onContactLeave: (() => void) | undefined
