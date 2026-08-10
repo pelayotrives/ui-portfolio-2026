@@ -47,23 +47,91 @@ function App() {
     const updateLenis = (time: number) => lenis.raf(time * 1000)
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nav = document.querySelector<HTMLElement>('.site-nav')
-    const handleScroll = ({ scroll }: { scroll: number }) => nav?.classList.toggle('site-nav--scrolled', scroll > 18)
+    const setNavScrolled = (scrolled: boolean) => nav?.classList.toggle('site-nav--scrolled', scrolled)
+    const handleScroll = ({ scroll }: { scroll: number }) => setNavScrolled(scroll > 18)
+    const handleNativeScroll = () => setNavScrolled(window.scrollY > 18)
     lenis.on('scroll', ScrollTrigger.update)
     lenis.on('scroll', handleScroll)
+    window.addEventListener('scroll', handleNativeScroll, { passive: true })
     gsap.ticker.add(updateLenis)
     gsap.ticker.lagSmoothing(0)
+    let disposeLoaderScene: (() => void) | undefined
+    let loaderCancelled = false
     const context = gsap.context(() => {
       const loader = document.querySelector<HTMLElement>('.intro-loader')
+      const canvasHost = document.querySelector<HTMLElement>('.intro-loader__canvas')
       const messages = gsap.utils.toArray<HTMLElement>('.intro-loader__message')
+      const loaderProgress = { value: 0 }
+      if (loader && canvasHost && !prefersReducedMotion) {
+        import('three').then((THREE) => {
+        if (loaderCancelled || !loader.isConnected) return
+        const scene = new THREE.Scene()
+        const camera = new THREE.OrthographicCamera(-4.4, 4.4, 2, -2, 0.1, 10)
+        camera.position.z = 5
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+        canvasHost.appendChild(renderer.domElement)
+        const geometry = new THREE.PlaneGeometry(5.2, 2.8)
+        const material = new THREE.ShaderMaterial({
+          uniforms: { uProgress: { value: loaderProgress.value }, uTime: { value: 0 } },
+          transparent: true,
+          depthWrite: false,
+          vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+          fragmentShader: `
+            varying vec2 vUv;
+            uniform float uProgress;
+            uniform float uTime;
+            float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+            void main() {
+              vec2 p = vUv * 2.0 - 1.0;
+              float outer = length(p) - 0.68;
+              float inner = length(p - vec2(0.22, 0.0)) - 0.58;
+              float moon = max(outer, -inner);
+              float sdf = mix(outer, moon, smoothstep(0.18, 0.84, uProgress));
+              float blur = 0.025 + 0.07 * sin(uProgress * 3.14159);
+              float shape = 1.0 - smoothstep(-blur, blur, sdf);
+              float glow = exp(-max(length(p) - 0.65, 0.0) * 7.0) * (1.0 - uProgress * 0.35);
+              float rays = (sin(atan(p.y, p.x) * 12.0 + uTime * 0.8) * 0.5 + 0.5) * 0.06 * (1.0 - uProgress);
+              vec3 sun = vec3(0.921, 0.369, 0.157);
+              vec3 moonColor = vec3(1.0, 0.988, 0.949);
+              vec3 color = mix(sun, moonColor, smoothstep(0.42, 0.92, uProgress));
+              float alpha = max(shape, glow * 0.22 + rays * shape);
+              gl_FragColor = vec4(color, alpha);
+            }
+          `,
+        })
+        const celestialBody = new THREE.Mesh(geometry, material)
+        scene.add(celestialBody)
+        const resize = () => renderer.setSize(canvasHost.clientWidth, canvasHost.clientHeight, false)
+        resize()
+        window.addEventListener('resize', resize)
+        const clock = new THREE.Clock()
+        renderer.setAnimationLoop(() => {
+          const elapsed = clock.getElapsedTime()
+          material.uniforms.uProgress.value = loaderProgress.value
+          material.uniforms.uTime.value = elapsed
+          celestialBody.rotation.z = Math.sin(elapsed * 0.7) * 0.04
+          renderer.render(scene, camera)
+        })
+        disposeLoaderScene = () => {
+          renderer.setAnimationLoop(null)
+          window.removeEventListener('resize', resize)
+          geometry.dispose()
+          material.dispose()
+          renderer.dispose()
+          renderer.domElement.remove()
+        }
+        }).catch(() => undefined)
+      }
       if (loader && !prefersReducedMotion) {
         const loaderTimeline = gsap.timeline({ onComplete: () => loader.setAttribute('aria-hidden', 'true') })
         messages.forEach((message, index) => {
           loaderTimeline
             .fromTo(message, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: 'power3.out' }, index === 0 ? 0.15 : '+=0.18')
             .to(message, { autoAlpha: 0, y: -10, duration: 0.28, ease: 'power2.in' }, '+=0.58')
-            .to('.intro-loader__progress', { scaleX: (index + 1) / messages.length, duration: 0.65, ease: 'power2.inOut' }, '<-0.12')
+            .to(loaderProgress, { value: (index + 1) / messages.length, duration: 0.65, ease: 'power2.inOut' }, '<-0.12')
         })
-        loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08')
+        loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08').call(() => disposeLoaderScene?.())
       } else if (loader) gsap.set(loader, { autoAlpha: 0 })
       gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
@@ -90,7 +158,7 @@ function App() {
         '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px',
       }, {
         '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px',
-        ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 78px', end: 'top top', scrub: 1, invalidateOnRefresh: true },
+        ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
     }, pageRef)
 
@@ -156,8 +224,11 @@ function App() {
       gsap.ticker.remove(updateLenis)
       lenis.off('scroll', ScrollTrigger.update)
       lenis.off('scroll', handleScroll)
+      window.removeEventListener('scroll', handleNativeScroll)
       lenis.destroy()
       context.revert()
+      loaderCancelled = true
+      disposeLoaderScene?.()
       if (onMove) window.removeEventListener('pointermove', onMove)
       if (onOver) window.removeEventListener('pointerover', onOver)
       if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
@@ -167,6 +238,7 @@ function App() {
 
   return (
     <div className="site-shell" ref={pageRef}>
+      <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives — Product Engineer</span></div></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b>✳</b></div>
       <header className="site-nav">
@@ -208,7 +280,7 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Digital Media Publisher</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Universitat Oberta de Catalunya</h3><p>University degree in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universitat Oberta de Catalunya</h3><p>University degree in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
