@@ -45,32 +45,68 @@ function App() {
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
     const updateLenis = (time: number) => lenis.raf(time * 1000)
+    const nav = document.querySelector<HTMLElement>('.site-nav')
+    const handleScroll = ({ scroll }: { scroll: number }) => nav?.classList.toggle('site-nav--scrolled', scroll > 18)
     lenis.on('scroll', ScrollTrigger.update)
+    lenis.on('scroll', handleScroll)
     gsap.ticker.add(updateLenis)
     gsap.ticker.lagSmoothing(0)
     const context = gsap.context(() => {
       gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
       })
-      gsap.from('.hero__title-line', {
-        yPercent: 110, opacity: 0, filter: 'blur(14px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
+      gsap.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
+        yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
+        scrollTrigger: { trigger: '.hero h1', start: 'top 58%', end: 'bottom 44%', toggleActions: 'play reverse play reverse' },
       })
-      gsap.from('.project-card', {
-        y: 42, opacity: 0, filter: 'blur(12px)', duration: 0.85, stagger: 0.12, ease: 'power3.out',
-        scrollTrigger: { trigger: '.project-grid', start: 'top 82%', once: true },
+      gsap.utils.toArray<HTMLElement>('.project-card').forEach((card, index) => {
+        gsap.fromTo(card, { y: 42, opacity: 0, filter: 'blur(12px)' }, {
+          y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.85, delay: index * 0.05, ease: 'power3.out',
+          scrollTrigger: { trigger: card, start: 'top 58%', end: 'bottom 42%', toggleActions: 'play reverse play reverse' },
+        })
+      })
+      gsap.fromTo('.timeline__progress', { scaleY: 0 }, { scaleY: 1, transformOrigin: 'top center', ease: 'none', scrollTrigger: { trigger: '.timeline', start: 'top 64%', end: 'bottom 54%', scrub: 0.8 } })
+      gsap.utils.toArray<HTMLElement>('.timeline__dot').forEach((dot) => {
+        gsap.timeline({ scrollTrigger: { trigger: dot, start: 'top 56%', end: 'bottom 44%', toggleActions: 'play reverse play reverse' } })
+          .fromTo(dot, { scale: 0, opacity: 0, rotation: -70 }, { scale: 1.35, opacity: 1, rotation: 12, duration: 0.36, ease: 'power4.out' })
+          .to(dot, { scale: 0.86, rotation: -5, duration: 0.28, ease: 'power2.inOut' })
+          .to(dot, { scale: 1, rotation: 0, duration: 0.58, ease: 'elastic.out(1, 0.45)' })
+      })
+      gsap.to('.contact-star', { rotation: 360, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
+      ScrollTrigger.create({
+        trigger: '.contact-section',
+        start: 'top 78px',
+        end: 'bottom top',
+        onEnter: () => document.querySelector('.contact-section')?.classList.add('contact-section--immersive'),
+        onEnterBack: () => document.querySelector('.contact-section')?.classList.add('contact-section--immersive'),
+        onLeaveBack: () => document.querySelector('.contact-section')?.classList.remove('contact-section--immersive'),
       })
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
+    const cursorCore = cursor?.querySelector<HTMLElement>('span')
+    const cursorOrbit = cursor?.querySelector<HTMLElement>('b')
     const cursorTrails = gsap.utils.toArray<HTMLElement>('.cursor-trail')
+    const contactSection = document.querySelector<HTMLElement>('.contact-section')
+    const contactTitle = document.querySelector<HTMLElement>('.contact-title-wrap')
     const hasPointer = window.matchMedia('(pointer: fine)').matches
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     let onMove: ((event: PointerEvent) => void) | undefined
     let onOver: ((event: PointerEvent) => void) | undefined
+    let onContactLeave: (() => void) | undefined
+    let onWindowLeave: (() => void) | undefined
+    let interactive = false
 
-    if (cursor && hasPointer && !prefersReducedMotion) {
+    if (cursor && cursorCore && cursorOrbit && hasPointer && !prefersReducedMotion) {
       const moveX = gsap.quickTo(cursor, 'x', { duration: 0.24, ease: 'power3.out' })
       const moveY = gsap.quickTo(cursor, 'y', { duration: 0.24, ease: 'power3.out' })
+      const setInteractive = (next: boolean) => {
+        if (next === interactive) return
+        interactive = next
+        cursor.classList.toggle('cursor--interactive', next)
+        gsap.to(cursorCore, { scale: next ? 1.16 : 1, duration: 0.32, ease: 'power2.inOut', overwrite: true })
+        gsap.to(cursorOrbit, { rotation: next ? 360 : 0, duration: 0.7, ease: 'power2.inOut', overwrite: true })
+      }
       onMove = (event: PointerEvent) => {
         moveX(event.clientX)
         moveY(event.clientY)
@@ -83,22 +119,39 @@ function App() {
             overwrite: 'auto',
           })
         })
+        setInteractive(Boolean((event.target as Element).closest('a, button')))
+        if (contactSection && contactTitle) {
+          const bounds = contactSection.getBoundingClientRect()
+          const inside = event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom
+          if (inside) {
+            const titleBounds = contactTitle.getBoundingClientRect()
+            contactTitle.style.setProperty('--cursor-x', `${event.clientX - titleBounds.left}px`)
+            contactTitle.style.setProperty('--cursor-y', `${event.clientY - titleBounds.top}px`)
+            contactTitle.classList.add('contact-title-wrap--active')
+          } else contactTitle.classList.remove('contact-title-wrap--active')
+        }
       }
       onOver = (event: PointerEvent) => {
-        const target = event.target as HTMLElement
-        cursor.classList.toggle('cursor--interactive', Boolean(target.closest('a, button')))
+        setInteractive(Boolean((event.target as Element).closest('a, button')))
       }
       window.addEventListener('pointermove', onMove)
       window.addEventListener('pointerover', onOver)
+      onWindowLeave = () => setInteractive(false)
+      window.addEventListener('pointerleave', onWindowLeave)
+      onContactLeave = () => contactTitle?.classList.remove('contact-title-wrap--active')
+      contactSection?.addEventListener('pointerleave', onContactLeave)
     }
 
     return () => {
       gsap.ticker.remove(updateLenis)
       lenis.off('scroll', ScrollTrigger.update)
+      lenis.off('scroll', handleScroll)
       lenis.destroy()
       context.revert()
       if (onMove) window.removeEventListener('pointermove', onMove)
       if (onOver) window.removeEventListener('pointerover', onOver)
+      if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
+      if (onContactLeave) contactSection?.removeEventListener('pointerleave', onContactLeave)
     }
   }, [])
 
@@ -108,7 +161,7 @@ function App() {
       <div className="cursor" aria-hidden="true"><span /><b>✳</b></div>
       <header className="site-nav">
         <a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a>
-        <p className="nav-note">UI designer<br />based in Madrid / Kyoto</p>
+        <p className="nav-note">Product engineer<br />based in Kyoto</p>
         <nav aria-label="Main navigation">
           <a href="#work">Selected work</a>
           <a href="#about">About</a>
@@ -145,11 +198,11 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__item"><span className="timeline__date">Now</span><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s programme focused on Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2022</span><div><h3>Ironhack</h3><p>Web Development Bootcamp</p></div></div><div className="timeline__item"><span className="timeline__date">2021</span><div><h3>Bindin</h3><p>Brand identity, multimedia content and web structure for an educational marketplace.</p></div></div><div className="timeline__item"><span className="timeline__date">2017—2024</span><div><h3>Spanish Red Cross</h3><p>Volunteer developer focused on content creation and web maintenance.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m Pelayo Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Digital Media Publisher</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Universitat Oberta de Catalunya</h3><p>University degree in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
-        <section className="contact-section" aria-labelledby="contact-title"><p className="contact-kicker">Have a good project?</p><h2 id="contact-title">Let’s make<br /><em>the right thing.</em></h2><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
+        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><em>the right thing.</em></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><em>the right thing.</em></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
       <footer><span>© 2026 Pelayo Trives</span><span>Designed in Figma, built with care.</span><a href="#top">Back to top ↑</a></footer>
     </div>
