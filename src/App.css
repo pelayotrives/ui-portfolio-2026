@@ -66,8 +66,7 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .cursor { z-index: 60; }
 .cursor-trails { z-index: 59; }
 .project-card h3 { line-height: 1; margin-bottom: 12px; }
-.project-viewer__header h2 { margin: 0; font: clamp(1.6rem, 3vw, 2.5rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
-.project-viewer__header h2 span { color: var(--color-accent-deep); }
+.project-viewer__header h2 { margin: 0; font: clamp(1.25rem, 3vw, 2rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
 .project-viewer__close { display: inline-flex; align-items: center; gap: .45rem; }
 .project-viewer__close span { margin: 0; font-size: 1.65rem; line-height: .8; }
 .site-shell:has(.project-viewer) .cursor { mix-blend-mode: screen; }
