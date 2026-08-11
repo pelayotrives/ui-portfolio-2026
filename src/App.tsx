@@ -26,7 +26,7 @@ const projects: Project[] = [
   { number: '05', title: 'Floddets', year: '2023', note: 'A pause can be a decision, too.', className: 'project--floddets' },
 ]
 
-function ProjectArtwork({ project }: { project: Project }) {
+function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
   return (
     <div className={`artwork ${project.className}`} aria-hidden="true">
       <div className="artwork__label">fig. {project.number}</div>
@@ -37,6 +37,10 @@ function ProjectArtwork({ project }: { project: Project }) {
       <span className="artwork__stamp">FIGMA / UI / 00{project.number}</span>
     </div>
   )
+}
+
+function TypeText({ text, className }: Readonly<{ text: string; className: string }>) {
+  return <em className={className} aria-label={text}>{Array.from(text).map((character, index) => <span aria-hidden="true" key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</em>
 }
 
 function App() {
@@ -56,6 +60,7 @@ function App() {
     gsap.ticker.add(updateLenis)
     gsap.ticker.lagSmoothing(0)
     let disposeLoaderScene: (() => void) | undefined
+    let disposeHeroOrbScene: (() => void) | undefined
     let loaderCancelled = false
     let loaderFinished = false
     const context = gsap.context(() => {
@@ -118,6 +123,91 @@ function App() {
         }
         }).catch(() => undefined)
       }
+      const heroOrbHost = document.querySelector<HTMLElement>('.hero-orb__canvas')
+      if (heroOrbHost && !prefersReducedMotion) {
+        import('three').then((THREE) => {
+          if (loaderCancelled || !heroOrbHost.isConnected) return
+          const scene = new THREE.Scene()
+          const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 20)
+          camera.position.z = 5.6
+          const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+          renderer.outputColorSpace = THREE.SRGBColorSpace
+          heroOrbHost.appendChild(renderer.domElement)
+          const root = new THREE.Group()
+          const scrollRig = new THREE.Group()
+          root.add(scrollRig)
+          scene.add(root)
+          const glassMaterial = new THREE.MeshPhysicalMaterial({
+            color: '#fffcf2',
+            metalness: 0,
+            roughness: 0.035,
+            transmission: 0.92,
+            thickness: 0.62,
+            ior: 1.5,
+            clearcoat: 1,
+            clearcoatRoughness: 0.025,
+            transparent: true,
+            opacity: 0.44,
+            depthWrite: false,
+          })
+          const veilMaterial = new THREE.MeshBasicMaterial({ color: '#ccc5b9', transparent: true, opacity: 0.08, depthWrite: false })
+          const mistMaterial = new THREE.MeshStandardMaterial({ color: '#fffcf2', roughness: 0.9, metalness: 0, transparent: true, opacity: 0.13, depthWrite: false })
+          const highlightMaterial = new THREE.MeshBasicMaterial({ color: '#fffcf2', transparent: true, opacity: 0.6, depthWrite: false })
+          const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.34, 72, 72), glassMaterial)
+          const innerVeil = new THREE.Mesh(new THREE.SphereGeometry(1.08, 48, 48), veilMaterial)
+          const mistOne = new THREE.Mesh(new THREE.IcosahedronGeometry(0.72, 3), mistMaterial)
+          const mistTwo = new THREE.Mesh(new THREE.IcosahedronGeometry(0.46, 2), mistMaterial.clone())
+          mistTwo.position.set(0.32, -0.18, 0.18)
+          mistTwo.material.opacity = 0.09
+          const highlightArc = new THREE.Mesh(new THREE.TorusGeometry(0.74, 0.018, 10, 96), highlightMaterial)
+          highlightArc.position.set(-0.32, 0.45, 0.9)
+          highlightArc.scale.y = 0.32
+          highlightArc.rotation.set(Math.PI * 0.18, Math.PI * 0.04, -Math.PI * 0.08)
+          const glint = new THREE.Mesh(new THREE.SphereGeometry(0.105, 24, 24), highlightMaterial.clone())
+          glint.position.set(-0.54, 0.62, 0.98)
+          glint.material.opacity = 0.72
+          scrollRig.add(sphere, innerVeil, mistOne, mistTwo, highlightArc, glint)
+          scene.add(new THREE.HemisphereLight('#fffcf2', '#403d39', 2.7))
+          const keyLight = new THREE.DirectionalLight('#ffffff', 3.2)
+          keyLight.position.set(2.4, 3.2, 4.4)
+          scene.add(keyLight)
+          const rimLight = new THREE.DirectionalLight('#ccc5b9', 1.2)
+          rimLight.position.set(-3, -1.5, 2)
+          scene.add(rimLight)
+          const resize = () => {
+            const width = heroOrbHost.clientWidth
+            const height = heroOrbHost.clientHeight
+            if (!width || !height) return
+            camera.aspect = width / height
+            camera.updateProjectionMatrix()
+            renderer.setSize(width, height, false)
+          }
+          const observer = new ResizeObserver(resize)
+          observer.observe(heroOrbHost)
+          resize()
+          const clock = new THREE.Clock()
+          renderer.setAnimationLoop(() => {
+            const elapsed = clock.getElapsedTime()
+            mistOne.rotation.set(elapsed * 0.08, elapsed * 0.12, elapsed * 0.05)
+            mistTwo.rotation.set(-elapsed * 0.1, elapsed * 0.07, -elapsed * 0.08)
+            highlightArc.rotation.z = -Math.PI * 0.08 + Math.sin(elapsed * 0.7) * 0.035
+            renderer.render(scene, camera)
+          })
+          gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } })
+            .to(scrollRig.rotation, { y: Math.PI * 2, x: Math.PI * 0.35, ease: 'none' }, 0)
+            .to(root.rotation, { z: -Math.PI * 0.18, ease: 'none' }, 0)
+            .to(scrollRig.position, { y: -0.22, ease: 'none' }, 0)
+          disposeHeroOrbScene = () => {
+            renderer.setAnimationLoop(null)
+            observer.disconnect()
+            ;[sphere, innerVeil, mistOne, mistTwo, highlightArc, glint].forEach((mesh) => mesh.geometry.dispose())
+            ;[glassMaterial, veilMaterial, mistMaterial, mistTwo.material, highlightMaterial, glint.material].forEach((material) => material.dispose())
+            renderer.dispose()
+            renderer.domElement.remove()
+          }
+        }).catch(() => undefined)
+      }
       if (loader && !prefersReducedMotion) {
         const loaderTimeline = gsap.timeline({ onComplete: () => loader.setAttribute('aria-hidden', 'true') })
         messages.forEach((message, index) => {
@@ -155,9 +245,9 @@ function App() {
         '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px',
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
-      gsap.timeline({ defaults: { duration: 1, ease: 'power2.inOut' }, scrollTrigger: { trigger: '.contact-section', start: 'top 20%', end: 'top -5%', scrub: 1.8, invalidateOnRefresh: true } })
-        .to('.contact-morph__current', { clipPath: 'inset(0 100% 0 0 round .24em)', opacity: 0, filter: 'blur(8px)', x: -8 })
-        .fromTo('.contact-morph__next', { clipPath: 'inset(0 0 0 100% round .24em)', opacity: 0, filter: 'blur(16px)', scale: .94 }, { clipPath: 'inset(0 0% 0 0 round .24em)', opacity: 1, filter: 'blur(0px)', scale: 1, ease: 'power3.out' }, '<0.04')
+      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 20%', end: 'top -5%', scrub: 0.45, invalidateOnRefresh: true } })
+        .to('.contact-morph__current span', { opacity: 0, duration: 0.48, stagger: { each: 0.035, from: 'end' } })
+        .to('.contact-morph__next span', { opacity: 1, duration: 0.48, stagger: 0.05 })
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
@@ -227,6 +317,7 @@ function App() {
       context.revert()
       loaderCancelled = true
       disposeLoaderScene?.()
+      disposeHeroOrbScene?.()
       if (onMove) window.removeEventListener('pointermove', onMove)
       if (onOver) window.removeEventListener('pointerover', onOver)
       if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
@@ -255,7 +346,7 @@ function App() {
           <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
           <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences — with a soft spot for the strange bits.</p>
           <a className="hero__scroll" href="#work"><span>Scroll to explore</span><span className="arrow">↓</span></a>
-          <div className="hero__scribble" aria-hidden="true">↝</div>
+          <div className="hero-orb" aria-hidden="true"><div className="hero-orb__canvas" /></div>
         </section>
 
         <section className="work-section" id="work" aria-labelledby="work-title">
@@ -282,7 +373,7 @@ function App() {
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
-        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><em className="contact-morph__current">the right thing.</em><em className="contact-morph__next" aria-hidden="true">the best.</em></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><em className="contact-morph__current">the right thing.</em><em className="contact-morph__next">the best.</em></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayotrives-pozuelo/">Start a conversation <span>↗</span></a></section>
+        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayotrives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
       <footer><span>© 2026 Pelayo Trives</span><span>Proudly designed by Pelayo Trives.</span><a href="#top">Back to top ↑</a></footer>
     </div>
