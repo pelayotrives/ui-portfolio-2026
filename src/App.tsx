@@ -4,11 +4,12 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import './App.css'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(MotionPathPlugin, ScrollTrigger)
 
 const loadThree = () => import('./three-runtime').then(({ THREE }) => THREE)
 
@@ -432,7 +433,28 @@ function App() {
           .to(navActions, { x: () => getNavShift(), ease: 'none' }, 0)
         }
       })
-      gsap.to('.contact-star', { rotation: 180, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
+      const contactStar = document.querySelector<SVGTextElement>('.contact-star__glyph')
+      const contactStarPath = document.querySelector<SVGPathElement>('.contact-star-path')
+      const contactStarTrail = document.querySelector<SVGPathElement>('.contact-star-trail')
+      if (contactStar && contactStarPath && contactStarTrail) {
+        const pathLength = contactStarPath.getTotalLength()
+        gsap.set(contactStarTrail, { strokeDasharray: '7 14', strokeDashoffset: pathLength })
+        gsap.timeline({
+          scrollTrigger: {
+            trigger: '.contact-section',
+            start: 'top 78%',
+            end: 'top 10%',
+            scrub: 1.1,
+            invalidateOnRefresh: true,
+          },
+        })
+          .to(contactStar, {
+            motionPath: { path: contactStarPath, align: contactStarPath, alignOrigin: [0.5, 0.5], autoRotate: false },
+            rotation: 180,
+            ease: 'none',
+          }, 0)
+          .to(contactStarTrail, { strokeDashoffset: 0, ease: 'none' }, 0)
+      }
       gsap.fromTo('.contact-section', {
         '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px', '--contact-grid-opacity': 0,
       }, {
@@ -440,10 +462,9 @@ function App() {
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
       gsap.fromTo('.contact-section', { '--contact-grid-opacity': 0 }, { '--contact-grid-opacity': 0.42, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 52%', end: 'top 12%', scrub: 0.8, invalidateOnRefresh: true } })
-      gsap.fromTo('.contact-section', { '--contact-trail-opacity': 0, '--contact-trail-rotation': 0 }, { '--contact-trail-opacity': 0.55, '--contact-trail-rotation': 180, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 52%', end: 'top 12%', scrub: 0.8, invalidateOnRefresh: true } })
-      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 5%', end: 'top -15%', scrub: 0.45, invalidateOnRefresh: true } })
-        .to('.contact-morph__current span', { opacity: 0, duration: 0.48, stagger: { each: 0.035, from: 'end' } })
-        .to('.contact-morph__next span', { opacity: 1, duration: 0.48, stagger: 0.05 })
+      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 18%', end: 'top -42%', scrub: 0.8, invalidateOnRefresh: true } })
+        .to('.contact-morph__current span', { opacity: 0, duration: 0.72, stagger: { each: 0.055, from: 'end' } })
+        .to('.contact-morph__next span', { opacity: 1, duration: 0.72, stagger: 0.075 })
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
@@ -525,12 +546,12 @@ function App() {
 
   return (
     <div className="site-shell" ref={pageRef}>
-      <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives — Product Engineer</span></div></div>
+      <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b>✳</b></div>
       <header className="site-nav">
         <div className="site-nav__brand"><a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a></div>
-        <div className="site-nav__meta"><p className="nav-note">Product engineer<br />based in Kyoto</p></div>
+        <div className="site-nav__meta"><p className="nav-note">Product Engineer<br />based in Kyoto</p></div>
         <nav className="site-nav__actions" aria-label="Main navigation">
           <a href="#work">Selected work</a>
           <a href="#about">About</a>
@@ -540,9 +561,9 @@ function App() {
 
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="hero__eyebrow"><span className="dot" /> Pelayo Trives - Product Engineer</div>
+          <div className="hero__eyebrow"><span className="dot" /> Pelayo Trives | Product Engineer</div>
           <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
-          <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences — with a soft spot for the strange bits.</p>
+          <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences, with a soft spot for the strange bits.</p>
           <a className="hero__scroll" href="#work"><span>Scroll to explore</span><span className="arrow">↓</span></a>
           <div className="hero-orb" aria-hidden="true"><div className="hero-orb__canvas" /></div>
         </section>
@@ -567,7 +588,7 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A UI designer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
         </section>
 
         <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayotrives-pozuelo/">Start a conversation <span>↗</span></a></section>

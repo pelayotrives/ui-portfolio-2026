@@ -1,6 +1,6 @@
 /* TEAM */
 Designer: Pelayo Trives
-Role: UI Designer
+Role: Product Engineer
 Site: https://pelayotrives.github.io/ui-portfolio-2026/
 
 /* SITE */
