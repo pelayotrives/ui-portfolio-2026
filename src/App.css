@@ -69,5 +69,5 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .project-viewer__header h2 { margin: 0; font: clamp(1.25rem, 3vw, 2rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
 .project-viewer__close { display: inline-flex; align-items: center; gap: .45rem; }
 .project-viewer__close span { margin: 0; font-size: 1.65rem; line-height: .8; }
-.site-shell:has(.project-viewer) .cursor { mix-blend-mode: screen; }
-.site-shell:has(.project-viewer) .cursor-trail { mix-blend-mode: screen; }
+.site-shell:has(.project-viewer) .cursor { z-index: 9999999999; mix-blend-mode: normal; filter: drop-shadow(0 0 2px var(--color-paper)); }
+.site-shell:has(.project-viewer) .cursor-trail { z-index: 9999999998; mix-blend-mode: normal; filter: drop-shadow(0 0 2px var(--color-paper)); }

@@ -233,6 +233,7 @@ function App() {
             }
             const environmentTarget = createEnvironment()
             if (environmentTarget) scene.environment = environmentTarget.texture
+            const prismPhase = { value: 0 }
             const glassMaterial = new THREE.MeshPhysicalMaterial({
             color: '#fffcf2',
             metalness: 0,
@@ -253,6 +254,19 @@ function App() {
             iridescenceThicknessRange: [120, 360],
             depthWrite: false,
           })
+            glassMaterial.onBeforeCompile = (shader) => {
+              shader.uniforms.uPrismPhase = prismPhase
+              shader.fragmentShader = shader.fragmentShader.replace(
+                '#include <output_fragment>',
+                `
+                  float prismFresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewPosition)), 0.0), 2.2);
+                  vec3 prismSpectrum = 0.5 + 0.5 * cos((prismFresnel * 7.5 + uPrismPhase * 6.2831853) + vec3(0.0, 2.0943951, 4.1887902));
+                  outgoingLight += prismSpectrum * prismFresnel * 0.16;
+                  #include <output_fragment>
+                `,
+              )
+            }
+            glassMaterial.customProgramCacheKey = () => 'hero-prism-v1'
             const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.36, constrainedDevice ? 48 : 64, constrainedDevice ? 48 : 64), glassMaterial)
             scrollRig.add(sphere)
             scene.add(new THREE.AmbientLight('#fffcf2', 1.5))
@@ -280,14 +294,34 @@ function App() {
             const timer = new THREE.Timer()
             timer.connect(document)
             let scrollProgress = 0
+            let pointerX = 0
+            let pointerY = 0
+            let pointerTargetX = 0
+            let pointerTargetY = 0
+            const heroSection = document.querySelector<HTMLElement>('.hero')
+            const handleHeroPointerMove = (event: PointerEvent) => {
+              if (!heroSection) return
+              const bounds = heroSection.getBoundingClientRect()
+              pointerTargetX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
+              pointerTargetY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
+            }
+            const handleHeroPointerLeave = () => {
+              pointerTargetX = 0
+              pointerTargetY = 0
+            }
+            heroSection?.addEventListener('pointermove', handleHeroPointerMove)
+            heroSection?.addEventListener('pointerleave', handleHeroPointerLeave)
             const renderHero = () => {
               timer.update()
               const elapsed = timer.getElapsed()
+              pointerX += (pointerTargetX - pointerX) * 0.065
+              pointerY += (pointerTargetY - pointerY) * 0.065
               const spin = elapsed * 0.32
-              sphere.rotation.y = spin + scrollProgress * Math.PI * 0.8
-              sphere.rotation.x = Math.sin(elapsed * 0.16) * 0.045 + scrollProgress * 0.08
-              scene.environmentRotation.y = elapsed * -0.18 + scrollProgress * -Math.PI * 1.65
-              const prismProgress = Math.sin(elapsed * 0.24 + scrollProgress * Math.PI * 3) * 0.5 + 0.5
+              sphere.rotation.y = spin + scrollProgress * Math.PI * 0.8 + pointerX * 0.72
+              sphere.rotation.x = Math.sin(elapsed * 0.16) * 0.045 + scrollProgress * 0.08 + pointerY * 0.42
+              scene.environmentRotation.y = elapsed * -0.18 + scrollProgress * -Math.PI * 1.65 + pointerX * 0.85
+              const prismProgress = Math.sin(elapsed * 0.24 + scrollProgress * Math.PI * 3 + pointerX * 1.8) * 0.5 + 0.5
+              prismPhase.value = prismProgress
               glassMaterial.iridescenceThicknessRange[0] = 112 + prismProgress * 42
               glassMaterial.iridescenceThicknessRange[1] = 338 + prismProgress * 68
               renderer.render(scene, camera)
@@ -306,6 +340,8 @@ function App() {
               .to(scrollRig.position, { x: -0.08, y: -0.16, ease: 'none' }, 0)
             disposeHeroOrbScene = () => {
               renderer.setAnimationLoop(null)
+              heroSection?.removeEventListener('pointermove', handleHeroPointerMove)
+              heroSection?.removeEventListener('pointerleave', handleHeroPointerLeave)
               observer.disconnect()
               visibilityObserver.disconnect()
               timer.dispose()
