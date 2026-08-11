@@ -65,6 +65,16 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 /* Final project-card and modal polish. */
 .cursor { z-index: 60; }
 .cursor-trails { z-index: 59; }
+.cursor b { display: grid; place-items: center; }
+.cursor b svg { width: 100%; height: 100%; stroke-width: 1.35; }
+.icon-arrow { display: inline-block; width: 1em; height: 1em; margin-left: .5rem; flex: 0 0 auto; vertical-align: -.16em; stroke-width: 1.8; }
+.nav-contact { display: inline-flex; align-items: center; }
+.nav-contact .icon-arrow { color: var(--color-accent); }
+.text-link .icon-arrow { color: var(--color-accent); }
+.contact-button .icon-arrow { color: var(--color-ink); }
+.project-card__meta .icon-arrow { width: 1.1em; height: 1.1em; margin-left: .25rem; color: var(--color-accent-deep); vertical-align: -.25em; }
+footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
+.contact-star__icon { display: block; width: 1em; height: 1em; stroke-width: 1.35; }
 .project-card h3 { line-height: 1; margin-bottom: 12px; }
 .artwork { aspect-ratio: 1 / 1; height: auto; max-height: none; }
 .artwork img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }

@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ArrowUp, ArrowUpRight, Asterisk } from 'lucide-react'
 import Lenis from 'lenis'
 import './App.css'
 
@@ -540,14 +541,14 @@ function App() {
     <div className="site-shell" ref={pageRef}>
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
-      <div className="cursor" aria-hidden="true"><span /><b>✳</b></div>
+      <div className="cursor" aria-hidden="true"><span /><b><Asterisk aria-hidden="true" /></b></div>
       <header className="site-nav">
         <div className="site-nav__brand"><a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a></div>
         <div className="site-nav__meta"><p className="nav-note">Product Engineer<br />based in Kyoto</p></div>
         <nav className="site-nav__actions" aria-label="Main navigation">
           <a href="#work">Selected work</a>
           <a href="#about">About</a>
-          <a className="nav-contact" href="mailto:pelayotrivespozuelo@gmail.com">Let's talk <span>↗</span></a>
+          <a className="nav-contact" href="mailto:pelayotrivespozuelo@gmail.com">Let's talk <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a>
         </nav>
       </header>
 
@@ -570,7 +571,7 @@ function App() {
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
                 <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`} onClick={(event) => { event.preventDefault(); setSelectedProject(project) }}>
                   <ProjectArtwork project={project} />
-                  <div className="project-card__meta"><span>{project.number} / {projectAreas[project.number]}</span><span>{project.year} <b>↗</b></span></div>
+                  <div className="project-card__meta"><span>{project.number} / {projectAreas[project.number]}</span><span>{project.year} <ArrowUpRight className="icon-arrow" aria-hidden="true" /></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
                 </a>
               </article>
@@ -580,12 +581,12 @@ function App() {
 
         <section className="about-section" id="about" aria-labelledby="about-title">
           <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <span>↗</span></a></div>
+          <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
         </section>
 
-        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
+        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true"><Asterisk className="contact-star__icon" /></div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></section>
       </main>
-      <footer><span>© 2026 Pelayo Trives</span><a href="#top">Back to top ↑</a></footer>
+      <footer><span>© 2026 Pelayo Trives</span><a href="#top">Back to top <ArrowUp className="icon-arrow" aria-hidden="true" /></a></footer>
       {selectedProject && <ProjectViewer project={selectedProject} onClose={() => setSelectedProject(null)} />}
     </div>
   )
