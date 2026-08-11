@@ -19,6 +19,18 @@ pnpm dev
 
 The local development server is usually available at `http://localhost:5173`.
 
+## Deployment
+
+GitHub Pages is deployed automatically by `.github/workflows/deploy-pages.yml`.
+
+After pushing to `main`:
+
+1. Open the repository on GitHub and go to `Settings → Pages`.
+2. Set `Source` to `GitHub Actions`.
+3. Push to `main`, or run `Deploy to GitHub Pages` manually from the `Actions` tab.
+
+The production site is published at `https://pelayotrives.github.io/ui-portfolio-2026/`.
+
 ## Adding projects
 
 Project content is defined in `src/App.tsx`. Update the project list and its matching artwork class in `src/App.css`. Replace the CSS artwork with real project imagery when the final assets are available.
