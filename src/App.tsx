@@ -2,7 +2,7 @@
  * macrostructure: Workbench · genre: editorial-playful · theme: Studio
  * audience: recruiters, studios and agencies · use: visual selection + contact
  */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
@@ -18,14 +18,15 @@ type Project = {
   year: string
   note: string
   className: string
+  figmaUrl: string
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2025', note: 'A digital space for returning to what matters.', className: 'project--octalea' },
-  { number: '02', title: 'Dealium', year: '2025', note: 'An identity that moves with the conversation.', className: 'project--dealium' },
-  { number: '03', title: 'Accra', year: '2024', note: 'Archive, memory and visual culture in layers.', className: 'project--accra' },
-  { number: '04', title: 'Sueños de Colores', year: '2024', note: 'Small rituals for making larger days count.', className: 'project--suenos' },
-  { number: '05', title: 'Floddets', year: '2023', note: 'A pause can be a decision, too.', className: 'project--floddets' },
+  { number: '01', title: 'Octalea', year: '2025', note: 'A digital space for returning to what matters.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share' },
+  { number: '02', title: 'Dealium', year: '2025', note: 'An identity that moves with the conversation.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share' },
+  { number: '03', title: 'Accra', year: '2024', note: 'Archive, memory and visual culture in layers.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share' },
+  { number: '04', title: 'Sueños de Colores', year: '2024', note: 'Small rituals for making larger days count.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share' },
+  { number: '05', title: 'Floddets', year: '2023', note: 'A pause can be a decision, too.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share' },
 ]
 
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
@@ -45,8 +46,39 @@ function TypeText({ text, className }: Readonly<{ text: string; className: strin
   return <em className={className} aria-label={text}>{Array.from(text).map((character, index) => <span aria-hidden="true" key={`${character}-${index}`}>{character === ' ' ? '\u00a0' : character}</span>)}</em>
 }
 
+function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClose: () => void }>) {
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  return (
+    <div className="project-viewer" role="dialog" aria-modal="true" aria-labelledby="project-viewer-title" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
+      <div className="project-viewer__panel">
+        <header className="project-viewer__header">
+          <div><span className="section-index">{project.number} / Figma study</span><h2 id="project-viewer-title">{project.title}</h2></div>
+          <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
+        </header>
+        <div className="project-viewer__frame">
+          <iframe src={project.figmaUrl} title={`${project.title} Figma design`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
+        </div>
+        <footer className="project-viewer__footer"><span>Live Figma file · view only</span><a href={project.figmaUrl} target="_blank" rel="noreferrer">Open in Figma ↗</a></footer>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const pageRef = useRef<HTMLDivElement>(null)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
   useEffect(() => {
     const lenis = new Lenis({ duration: 1.15, smoothWheel: true })
@@ -209,7 +241,7 @@ function App() {
             transparent: true,
             envMapIntensity: 2.2,
             opacity: 0.56,
-            iridescence: 0.22,
+            iridescence: 0.68,
             iridescenceIOR: 1.32,
             iridescenceThicknessRange: [120, 360],
             depthWrite: false,
@@ -227,9 +259,6 @@ function App() {
             const rimLight = new THREE.DirectionalLight('#ccc5b9', 1.6)
             rimLight.position.set(-3.4, -1.3, 2.4)
             scene.add(rimLight)
-            const warmCausticLight = new THREE.PointLight('#eb5e28', 0.8, 6, 2.1)
-            warmCausticLight.position.set(1.2, -0.9, 2.6)
-            scene.add(warmCausticLight)
             const resize = () => {
             const width = heroOrbHost.clientWidth
             const height = heroOrbHost.clientHeight
@@ -243,8 +272,17 @@ function App() {
             resize()
             const timer = new THREE.Timer()
             timer.connect(document)
+            let scrollProgress = 0
             const renderHero = () => {
               timer.update()
+              const elapsed = timer.getElapsed()
+              const spin = elapsed * 0.32
+              sphere.rotation.y = spin + scrollProgress * Math.PI * 0.8
+              sphere.rotation.x = Math.sin(elapsed * 0.16) * 0.045 + scrollProgress * 0.08
+              scene.environmentRotation.y = elapsed * -0.18 + scrollProgress * -Math.PI * 1.65
+              const prismProgress = Math.sin(elapsed * 0.24 + scrollProgress * Math.PI * 3) * 0.5 + 0.5
+              glassMaterial.iridescenceThicknessRange[0] = 112 + prismProgress * 42
+              glassMaterial.iridescenceThicknessRange[1] = 338 + prismProgress * 68
               renderer.render(scene, camera)
             }
             const visibilityObserver = new IntersectionObserver(([entry]) => {
@@ -255,7 +293,7 @@ function App() {
             }, { threshold: 0.01 })
             visibilityObserver.observe(heroOrbHost)
             renderer.setAnimationLoop(renderHero)
-            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } })
+            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true, onUpdate: (self) => { scrollProgress = self.progress } } })
               .to(scrollRig.rotation, { y: Math.PI * 1.75, x: Math.PI * 0.26, ease: 'none' }, 0)
               .to(root.rotation, { z: -Math.PI * 0.18, ease: 'none' }, 0)
               .to(scrollRig.position, { x: -0.08, y: -0.16, ease: 'none' }, 0)
@@ -453,7 +491,7 @@ function App() {
 
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="hero__eyebrow"><span className="dot" /> Portfolio / 2026</div>
+          <div className="hero__eyebrow"><span className="dot" /> Pelayo Trives - Product Engineer</div>
           <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
           <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences — with a soft spot for the strange bits.</p>
           <a className="hero__scroll" href="#work"><span>Scroll to explore</span><span className="arrow">↓</span></a>
@@ -468,7 +506,7 @@ function App() {
           <div className="project-grid">
             {projects.map((project, index) => (
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
-                <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`}>
+                <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`} onClick={(event) => { event.preventDefault(); setSelectedProject(project) }}>
                   <ProjectArtwork project={project} />
                   <div className="project-card__meta"><span>{project.number} / Selected work</span><span>{project.year} <b>↗</b></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
@@ -486,6 +524,7 @@ function App() {
         <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayotrives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
       <footer><span>© 2026 Pelayo Trives</span><span>Proudly designed by Pelayo Trives.</span><a href="#top">Back to top ↑</a></footer>
+      {selectedProject && <ProjectViewer project={selectedProject} onClose={() => setSelectedProject(null)} />}
     </div>
   )
 }

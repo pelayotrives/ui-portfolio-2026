@@ -37,3 +37,27 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 @media (max-width: 700px) {
   .hero-orb__canvas { inset: -10%; width: 120%; height: 120%; }
 }
+
+/* Figma studies stay out of the initial page flow and mount only when opened. */
+.project-viewer { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 1rem; background: rgba(37, 36, 34, .72); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.project-viewer__panel { width: min(1180px, 100%); height: min(88svh, 900px); display: flex; flex-direction: column; overflow: hidden; background: var(--color-paper); color: var(--color-ink); box-shadow: 0 24px 80px rgba(37, 36, 34, .24); }
+.project-viewer__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.25rem; border-bottom: var(--rule-hairline); }
+.project-viewer__header .section-index { margin: 0 0 .25rem; }
+.project-viewer__header h2 { margin: 0; font: clamp(1.6rem, 3vw, 2.5rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
+.project-viewer__close { appearance: none; border: 0; background: transparent; color: var(--color-ink); padding: .4rem 0; font: var(--text-micro); text-transform: uppercase; letter-spacing: .08em; cursor: none; }
+.project-viewer__close span { display: inline-block; margin-left: .35rem; color: var(--color-accent-deep); font-size: 1.25rem; line-height: .7; transition: transform var(--dur-fast) var(--ease-out); }
+.project-viewer__close:hover span { transform: rotate(90deg); }
+.project-viewer__frame { flex: 1; min-height: 0; background: #f7f5ed; }
+.project-viewer__frame iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; }
+.project-viewer__footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .8rem 1.25rem; border-top: var(--rule-hairline); color: var(--color-muted); font: var(--text-micro); text-transform: uppercase; letter-spacing: .06em; }
+.project-viewer__footer a { color: var(--color-ink); text-decoration: none; }
+.project-viewer__footer a:hover { color: var(--color-accent-deep); }
+.hero-orb::before { display: none; }
+
+@media (max-width: 700px) {
+  .project-viewer { padding: 0; }
+  .project-viewer__panel { width: 100%; height: 100svh; }
+  .project-viewer__header { padding: 1rem 1.1rem; }
+  .project-viewer__frame iframe { min-height: 0; }
+  .project-viewer__footer { padding: .75rem 1.1rem; font-size: .58rem; }
+}
