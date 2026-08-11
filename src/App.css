@@ -97,6 +97,8 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 [data-scroll-divider="top"]::before, [data-scroll-divider="bottom"]::after { content: ""; position: absolute; left: 0; right: 0; height: 1px; background: var(--color-line); transform: scaleX(var(--divider-progress)); transform-origin: left center; pointer-events: none; }
 [data-scroll-divider="top"]::before { top: 0; }
 [data-scroll-divider="bottom"]::after { bottom: 0; }
+.work-section { position: relative; z-index: 2; background: var(--color-paper); }
+.about-section { position: relative; z-index: 3; background: var(--color-paper); will-change: transform; }
 
 @media (max-width: 700px) {
   .contact-section::before { background-size: 34px 34px; transform: perspective(700px) rotateX(54deg) scale(1.5) translateY(14%); }

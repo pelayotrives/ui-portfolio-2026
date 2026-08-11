@@ -438,9 +438,21 @@ function App() {
       gsap.utils.toArray<HTMLElement>('[data-scroll-divider]').forEach((divider) => {
         gsap.fromTo(divider, { '--divider-progress': 0 }, {
           '--divider-progress': 1,
-          duration: 0.75,
-          ease: 'power3.out',
-          scrollTrigger: { trigger: divider, start: 'top 78%', toggleActions: 'play reverse play reverse', invalidateOnRefresh: true },
+          ease: 'none',
+          scrollTrigger: { trigger: divider, start: 'top 84%', end: 'top 50%', scrub: 1.15, invalidateOnRefresh: true },
+        })
+      })
+      media.add('(min-width: 701px)', () => {
+        gsap.fromTo('.about-section', { y: 0 }, {
+          y: () => -Math.min(window.innerHeight * 0.14, 140),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: '.work-section',
+            start: 'bottom bottom',
+            end: 'bottom top+=82',
+            scrub: 1.1,
+            invalidateOnRefresh: true,
+          },
         })
       })
       gsap.fromTo('.timeline__progress', { scaleY: 0 }, { scaleY: 1, transformOrigin: 'top center', ease: 'none', scrollTrigger: { trigger: '.timeline', start: 'top 64%', end: 'bottom 54%', scrub: 0.8 } })
