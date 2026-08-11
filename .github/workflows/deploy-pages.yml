@@ -5,6 +5,11 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      deploy_note:
+        description: "Optional note for this manual deployment"
+        required: false
+        default: "Manual deployment"
 
 permissions:
   contents: read
