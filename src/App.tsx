@@ -57,6 +57,7 @@ function App() {
     gsap.ticker.lagSmoothing(0)
     let disposeLoaderScene: (() => void) | undefined
     let loaderCancelled = false
+    let loaderFinished = false
     const context = gsap.context(() => {
       const loader = document.querySelector<HTMLElement>('.intro-loader')
       const canvasHost = document.querySelector<HTMLElement>('.intro-loader__canvas')
@@ -64,60 +65,54 @@ function App() {
       const loaderProgress = { value: 0 }
       if (loader && canvasHost && !prefersReducedMotion) {
         import('three').then((THREE) => {
-        if (loaderCancelled || !loader.isConnected) return
+        if (loaderCancelled || loaderFinished || !loader.isConnected) return
         const scene = new THREE.Scene()
-        const camera = new THREE.OrthographicCamera(-4.4, 4.4, 2, -2, 0.1, 10)
+        const camera = new THREE.OrthographicCamera(-2.2, 2.2, 2.2, -2.2, 0.1, 10)
         camera.position.z = 5
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' })
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5))
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
         canvasHost.appendChild(renderer.domElement)
-        const geometry = new THREE.PlaneGeometry(5.2, 2.8)
-        const material = new THREE.ShaderMaterial({
-          uniforms: { uProgress: { value: loaderProgress.value }, uTime: { value: 0 } },
-          transparent: true,
-          depthWrite: false,
-          vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-          fragmentShader: `
-            varying vec2 vUv;
-            uniform float uProgress;
-            uniform float uTime;
-            float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-            void main() {
-              vec2 p = vUv * 2.0 - 1.0;
-              float outer = length(p) - 0.68;
-              float inner = length(p - vec2(0.22, 0.0)) - 0.58;
-              float moon = max(outer, -inner);
-              float sdf = mix(outer, moon, smoothstep(0.18, 0.84, uProgress));
-              float blur = 0.025 + 0.07 * sin(uProgress * 3.14159);
-              float shape = 1.0 - smoothstep(-blur, blur, sdf);
-              float glow = exp(-max(length(p) - 0.65, 0.0) * 7.0) * (1.0 - uProgress * 0.35);
-              float rays = (sin(atan(p.y, p.x) * 12.0 + uTime * 0.8) * 0.5 + 0.5) * 0.06 * (1.0 - uProgress);
-              vec3 sun = vec3(0.921, 0.369, 0.157);
-              vec3 moonColor = vec3(1.0, 0.988, 0.949);
-              vec3 color = mix(sun, moonColor, smoothstep(0.42, 0.92, uProgress));
-              float alpha = max(shape, glow * 0.22 + rays * shape);
-              gl_FragColor = vec4(color, alpha);
-            }
-          `,
-        })
-        const celestialBody = new THREE.Mesh(geometry, material)
-        scene.add(celestialBody)
+        const material = new THREE.MeshBasicMaterial({ color: '#eb5e28', transparent: true, opacity: 0.96 })
+        const createPolygon = (sides: number) => {
+          const shape = new THREE.Shape()
+          for (let index = 0; index < sides; index += 1) {
+            const angle = -Math.PI / 2 + (index / sides) * Math.PI * 2
+            const x = Math.cos(angle) * 1.12
+            const y = Math.sin(angle) * 1.12
+            if (index === 0) shape.moveTo(x, y)
+            else shape.lineTo(x, y)
+          }
+          shape.closePath()
+          return new THREE.ShapeGeometry(shape, 2)
+        }
+        let polygonGeometry = createPolygon(3)
+        const polygon = new THREE.Mesh(polygonGeometry, material)
+        scene.add(polygon)
+        let currentSides = 3
         const resize = () => renderer.setSize(canvasHost.clientWidth, canvasHost.clientHeight, false)
         resize()
         window.addEventListener('resize', resize)
         const clock = new THREE.Clock()
         renderer.setAnimationLoop(() => {
           const elapsed = clock.getElapsedTime()
-          material.uniforms.uProgress.value = loaderProgress.value
-          material.uniforms.uTime.value = elapsed
-          celestialBody.rotation.z = Math.sin(elapsed * 0.7) * 0.04
+          const progress = loaderProgress.value
+          const nextSides = Math.min(8, 3 + Math.floor(progress * 5))
+          if (nextSides !== currentSides) {
+            polygonGeometry.dispose()
+            polygonGeometry = createPolygon(nextSides)
+            polygon.geometry = polygonGeometry
+            currentSides = nextSides
+          }
+          material.opacity = 0.88 + Math.sin(elapsed * 1.5) * 0.04
+          polygon.rotation.z = progress * Math.PI * 10 + elapsed * 0.08
+          polygon.scale.setScalar(1 + Math.sin(elapsed * 1.3) * 0.018)
           renderer.render(scene, camera)
         })
         disposeLoaderScene = () => {
           renderer.setAnimationLoop(null)
           window.removeEventListener('resize', resize)
-          geometry.dispose()
           material.dispose()
+          polygonGeometry.dispose()
           renderer.dispose()
           renderer.domElement.remove()
         }
@@ -131,7 +126,7 @@ function App() {
             .to(message, { autoAlpha: 0, y: -10, duration: 0.28, ease: 'power2.in' }, '+=0.58')
             .to(loaderProgress, { value: (index + 1) / messages.length, duration: 0.65, ease: 'power2.inOut' }, '<-0.12')
         })
-        loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08').call(() => disposeLoaderScene?.())
+        loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08').call(() => { loaderFinished = true; disposeLoaderScene?.() })
       } else if (loader) gsap.set(loader, { autoAlpha: 0 })
       gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
@@ -155,11 +150,14 @@ function App() {
       })
       gsap.to('.contact-star', { rotation: 360, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
       gsap.fromTo('.contact-section', {
-        '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px',
+        '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px',
       }, {
-        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px',
+        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px',
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
+      gsap.timeline({ defaults: { duration: 1, ease: 'power2.inOut' }, scrollTrigger: { trigger: '.contact-section', start: 'top 20%', end: 'top -5%', scrub: 1.8, invalidateOnRefresh: true } })
+        .to('.contact-morph__current', { clipPath: 'inset(0 100% 0 0 round .24em)', opacity: 0, filter: 'blur(8px)', x: -8 })
+        .fromTo('.contact-morph__next', { clipPath: 'inset(0 0 0 100% round .24em)', opacity: 0, filter: 'blur(16px)', scale: .94 }, { clipPath: 'inset(0 0% 0 0 round .24em)', opacity: 1, filter: 'blur(0px)', scale: 1, ease: 'power3.out' }, '<0.04')
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
@@ -284,9 +282,9 @@ function App() {
           <div className="about-orbit" aria-hidden="true"><div className="orbit orbit--outer" /><div className="orbit orbit--inner" /><span>✳</span><small>always<br />curious</small></div>
         </section>
 
-        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><em>the right thing.</em></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><em>the right thing.</em></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
+        <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><em className="contact-morph__current">the right thing.</em><em className="contact-morph__next" aria-hidden="true">the best.</em></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><em className="contact-morph__current">the right thing.</em><em className="contact-morph__next">the best.</em></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayotrives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
-      <footer><span>© 2026 Pelayo Trives</span><span>Designed in Figma, built with care.</span><a href="#top">Back to top ↑</a></footer>
+      <footer><span>© 2026 Pelayo Trives</span><span>Proudly designed by Pelayo Trives.</span><a href="#top">Back to top ↑</a></footer>
     </div>
   )
 }
