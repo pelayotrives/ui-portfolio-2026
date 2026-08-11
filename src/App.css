@@ -75,10 +75,10 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 /* The contact expansion gets a quiet technical grid, inspired by Vercel's depth cues. */
 .contact-section { --contact-grid-opacity: 0; }
 .contact-section::before { content: ""; position: absolute; inset: -8% -4%; z-index: 0; pointer-events: none; opacity: var(--contact-grid-opacity); background-image: linear-gradient(rgba(204, 197, 185, .15) 1px, transparent 1px), linear-gradient(90deg, rgba(204, 197, 185, .15) 1px, transparent 1px); background-size: clamp(38px, 5vw, 76px) clamp(38px, 5vw, 76px); transform: perspective(900px) rotateX(56deg) scale(1.35) translateY(12%); transform-origin: center top; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 84%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 84%, transparent 100%); transition: opacity .1s linear; }
-.contact-section { --contact-trail-opacity: 0; --contact-trail-rotation: 0; }
-.contact-section::after { content: ""; position: absolute; top: 7%; right: 3%; z-index: 0; width: clamp(190px, 22vw, 300px); height: clamp(110px, 13vw, 170px); border: 1px dashed rgba(204, 197, 185, .58); border-radius: 50%; opacity: var(--contact-trail-opacity); transform: rotate(calc(var(--contact-trail-rotation) * 1deg)); transform-origin: center; pointer-events: none; }
 .contact-section > * { position: relative; }
+.contact-section > .contact-star { position: absolute; top: 10%; right: 7%; z-index: 1; display: block; width: max-content; color: var(--color-accent); font-size: clamp(9rem, 18vw, 16rem); line-height: .72; opacity: .86; transform-origin: center; will-change: transform; pointer-events: none; }
 
 @media (max-width: 700px) {
   .contact-section::before { background-size: 34px 34px; transform: perspective(700px) rotateX(54deg) scale(1.5) translateY(14%); }
+  .contact-section > .contact-star { top: 31%; right: 5%; font-size: 7rem; }
 }

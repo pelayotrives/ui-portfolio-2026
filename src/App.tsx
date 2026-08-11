@@ -4,12 +4,11 @@
  */
 import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { MotionPathPlugin } from 'gsap/MotionPathPlugin'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import './App.css'
 
-gsap.registerPlugin(MotionPathPlugin, ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger)
 
 const loadThree = () => import('./three-runtime').then(({ THREE }) => THREE)
 
@@ -433,28 +432,17 @@ function App() {
           .to(navActions, { x: () => getNavShift(), ease: 'none' }, 0)
         }
       })
-      const contactStar = document.querySelector<SVGTextElement>('.contact-star__glyph')
-      const contactStarPath = document.querySelector<SVGPathElement>('.contact-star-path')
-      const contactStarTrail = document.querySelector<SVGPathElement>('.contact-star-trail')
-      if (contactStar && contactStarPath && contactStarTrail) {
-        const pathLength = contactStarPath.getTotalLength()
-        gsap.set(contactStarTrail, { strokeDasharray: '7 14', strokeDashoffset: pathLength })
-        gsap.timeline({
-          scrollTrigger: {
-            trigger: '.contact-section',
-            start: 'top 78%',
-            end: 'top 10%',
-            scrub: 1.1,
-            invalidateOnRefresh: true,
-          },
-        })
-          .to(contactStar, {
-            motionPath: { path: contactStarPath, align: contactStarPath, alignOrigin: [0.5, 0.5], autoRotate: false },
-            rotation: 180,
-            ease: 'none',
-          }, 0)
-          .to(contactStarTrail, { strokeDashoffset: 0, ease: 'none' }, 0)
-      }
+      gsap.to('.contact-star', {
+        rotation: 360,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.contact-section',
+          start: 'top bottom',
+          end: 'bottom top',
+          scrub: 1.4,
+          invalidateOnRefresh: true,
+        },
+      })
       gsap.fromTo('.contact-section', {
         '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px', '--contact-grid-opacity': 0,
       }, {
@@ -462,9 +450,17 @@ function App() {
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
       gsap.fromTo('.contact-section', { '--contact-grid-opacity': 0 }, { '--contact-grid-opacity': 0.42, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 52%', end: 'top 12%', scrub: 0.8, invalidateOnRefresh: true } })
-      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 18%', end: 'top -42%', scrub: 0.8, invalidateOnRefresh: true } })
-        .to('.contact-morph__current span', { opacity: 0, duration: 0.72, stagger: { each: 0.055, from: 'end' } })
-        .to('.contact-morph__next span', { opacity: 1, duration: 0.72, stagger: 0.075 })
+      gsap.timeline({
+        defaults: { ease: 'power2.inOut' },
+        scrollTrigger: {
+          trigger: '.contact-morph',
+          start: 'top 72%',
+          toggleActions: 'play none none reverse',
+          invalidateOnRefresh: true,
+        },
+      })
+        .to('.contact-morph__current span', { opacity: 0, duration: 0.36, stagger: { each: 0.025, from: 'end' } })
+        .to('.contact-morph__next span', { opacity: 1, duration: 0.42, stagger: 0.035 })
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
