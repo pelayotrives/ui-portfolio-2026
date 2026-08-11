@@ -22,12 +22,20 @@ type Project = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2025', note: 'A digital space for returning to what matters.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share' },
-  { number: '02', title: 'Dealium', year: '2025', note: 'An identity that moves with the conversation.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share' },
-  { number: '03', title: 'Accra', year: '2024', note: 'Archive, memory and visual culture in layers.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share' },
-  { number: '04', title: 'Sueños de Colores', year: '2024', note: 'Small rituals for making larger days count.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share' },
-  { number: '05', title: 'Floddets', year: '2023', note: 'A pause can be a decision, too.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share' },
 ]
+
+const projectAreas: Record<string, string> = {
+  '01': 'AI development & automation',
+  '02': 'Business consulting',
+  '03': 'Natural products e-commerce',
+  '04': 'Children’s nursery',
+  '05': 'Handmade eyewear atelier',
+}
 
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
   return (
@@ -64,13 +72,12 @@ function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClos
     <div className="project-viewer" role="dialog" aria-modal="true" aria-labelledby="project-viewer-title" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}>
       <div className="project-viewer__panel">
         <header className="project-viewer__header">
-          <div><span className="section-index">{project.number} / Figma study</span><h2 id="project-viewer-title">{project.title}</h2></div>
+          <h2 id="project-viewer-title"><span>{project.number}</span> / {project.title}</h2>
           <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
         </header>
         <div className="project-viewer__frame">
           <iframe src={project.figmaUrl} title={`${project.title} Figma design`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
         </div>
-        <footer className="project-viewer__footer"><span>Live Figma file · view only</span><a href={project.figmaUrl} target="_blank" rel="noreferrer">Open in Figma ↗</a></footer>
       </div>
     </div>
   )
@@ -508,7 +515,7 @@ function App() {
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
                 <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`} onClick={(event) => { event.preventDefault(); setSelectedProject(project) }}>
                   <ProjectArtwork project={project} />
-                  <div className="project-card__meta"><span>{project.number} / Selected work</span><span>{project.year} <b>↗</b></span></div>
+                  <div className="project-card__meta"><span>{project.number} / {projectAreas[project.number]}</span><span>{project.year} <b>↗</b></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
                 </a>
               </article>
