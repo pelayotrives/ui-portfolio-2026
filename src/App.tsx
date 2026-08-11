@@ -551,7 +551,7 @@ function App() {
         <nav className="site-nav__actions" aria-label="Main navigation">
           <a href="#work">Selected work</a>
           <a href="#about">About</a>
-          <a className="nav-contact" href="mailto:hello@pelayotrives.com">Let's talk <span>↗</span></a>
+          <a className="nav-contact" href="mailto:pelayotrivespozuelo@gmail.com">Let's talk <span>↗</span></a>
         </nav>
       </header>
 
