@@ -589,7 +589,7 @@ function App() {
 
         <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true">✳</div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <span>↗</span></a></section>
       </main>
-      <footer><span>© 2026 Pelayo Trives</span><span>Proudly designed by Pelayo Trives.</span><a href="#top">Back to top ↑</a></footer>
+      <footer><span>© 2026 Pelayo Trives</span><a href="#top">Back to top ↑</a></footer>
       {selectedProject && <ProjectViewer project={selectedProject} onClose={() => setSelectedProject(null)} />}
     </div>
   )
