@@ -432,14 +432,16 @@ function App() {
           .to(navActions, { x: () => getNavShift(), ease: 'none' }, 0)
         }
       })
-      gsap.to('.contact-star', { rotation: 360, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
+      gsap.to('.contact-star', { rotation: 180, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
       gsap.fromTo('.contact-section', {
         '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px', '--contact-grid-opacity': 0,
       }, {
-        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px', '--contact-grid-opacity': 0.42,
+        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px',
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
-      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 20%', end: 'top -5%', scrub: 0.45, invalidateOnRefresh: true } })
+      gsap.fromTo('.contact-section', { '--contact-grid-opacity': 0 }, { '--contact-grid-opacity': 0.42, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 52%', end: 'top 12%', scrub: 0.8, invalidateOnRefresh: true } })
+      gsap.fromTo('.contact-section', { '--contact-trail-opacity': 0, '--contact-trail-rotation': 0 }, { '--contact-trail-opacity': 0.55, '--contact-trail-rotation': 180, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 52%', end: 'top 12%', scrub: 0.8, invalidateOnRefresh: true } })
+      gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 5%', end: 'top -15%', scrub: 0.45, invalidateOnRefresh: true } })
         .to('.contact-morph__current span', { opacity: 0, duration: 0.48, stagger: { each: 0.035, from: 'end' } })
         .to('.contact-morph__next span', { opacity: 1, duration: 0.48, stagger: 0.05 })
     }, pageRef)
