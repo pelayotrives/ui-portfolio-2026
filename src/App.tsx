@@ -200,10 +200,12 @@ function App() {
               if (!context2d) return null
               const gradient = context2d.createLinearGradient(0, 0, canvas.width, 0)
               gradient.addColorStop(0, '#403d39')
-              gradient.addColorStop(0.2, '#fffcf2')
-              gradient.addColorStop(0.42, '#ccc5b9')
+              gradient.addColorStop(0.16, '#eb5e28')
+              gradient.addColorStop(0.3, '#fffcf2')
+              gradient.addColorStop(0.44, '#7d77e8')
               gradient.addColorStop(0.58, '#252422')
-              gradient.addColorStop(0.76, '#fffcf2')
+              gradient.addColorStop(0.72, '#fffcf2')
+              gradient.addColorStop(0.86, '#eb5e28')
               gradient.addColorStop(1, '#403d39')
               context2d.fillStyle = gradient
               context2d.fillRect(0, 0, canvas.width, canvas.height)
@@ -219,12 +221,13 @@ function App() {
             const environmentTarget = createEnvironment()
             if (environmentTarget) scene.environment = environmentTarget.texture
             const prismPhase = { value: 0 }
-            const prismStrength = { value: 0 }
+            const prismStrength = { value: 0.32 }
+            const prismBaseStrength = 0.32
             const prismAxis = new THREE.Vector3(0.35, 0.78, 0.52).normalize()
             const glassMaterial = new THREE.MeshPhysicalMaterial({
-              color: '#fffcf2', metalness: 0, roughness: 0.1, transmission: 0.92, thickness: 1.35,
-              ior: 1.45, clearcoat: 0.82, clearcoatRoughness: 0.08, reflectivity: 0.72,
-              transparent: true, envMapIntensity: 1.65, opacity: 0.72, depthWrite: false,
+              color: '#fffcf2', metalness: 0, roughness: 0.06, transmission: 0.88, thickness: 1.2,
+              ior: 1.45, clearcoat: 0.9, clearcoatRoughness: 0.05, reflectivity: 0.82,
+              transparent: true, envMapIntensity: 2.1, opacity: 0.68, depthWrite: false,
             })
             const prismMaterial = new THREE.ShaderMaterial({
               uniforms: { uPrismAxis: { value: prismAxis }, uPrismPhase: prismPhase, uPrismStrength: prismStrength },
@@ -255,17 +258,59 @@ function App() {
                   float facing = max(dot(normalize(vViewNormal), normalize(vViewDirection)), 0.0);
                   float rim = pow(1.0 - facing, 3.6);
                   float band = smoothstep(0.18, 0.82, 0.5 + 0.5 * sin(field));
-                  float alpha = rim * band * uPrismStrength * 0.2;
-                  gl_FragColor = vec4(mix(vec3(1.0), chroma, 0.72) * alpha, alpha);
+                  float alpha = rim * band * uPrismStrength * 0.44;
+                  gl_FragColor = vec4(mix(vec3(1.0), chroma, 0.9) * alpha, alpha);
                 }
               `,
               transparent: true, depthWrite: false, side: THREE.DoubleSide,
             })
+            const dandelionGroup = new THREE.Group()
+            const dandelionSeedCount = constrainedDevice ? 76 : 132
+            const dandelionLinePositions: number[] = []
+            const dandelionTipPositions: number[] = []
+            const goldenAngle = Math.PI * (3 - Math.sqrt(5))
+            for (let index = 0; index < dandelionSeedCount; index += 1) {
+              const normalized = (index + 0.5) / dandelionSeedCount
+              const y = 1 - normalized * 2
+              const ring = Math.sqrt(Math.max(0, 1 - y * y))
+              const angle = index * goldenAngle
+              const directionX = Math.cos(angle) * ring
+              const directionZ = Math.sin(angle) * ring
+              const length = 0.57 + (index % 5) * 0.035
+              const tipX = directionX * length
+              const tipY = 0.16 + y * length * 0.86
+              const tipZ = directionZ * length
+              dandelionLinePositions.push(0, 0.16, 0, tipX, tipY, tipZ)
+              dandelionTipPositions.push(tipX, tipY, tipZ)
+            }
+            const dandelionGeometry = new THREE.BufferGeometry()
+            dandelionGeometry.setAttribute('position', new THREE.Float32BufferAttribute(dandelionLinePositions, 3))
+            const dandelionTipGeometry = new THREE.BufferGeometry()
+            dandelionTipGeometry.setAttribute('position', new THREE.Float32BufferAttribute(dandelionTipPositions, 3))
+            const dandelionLineMaterial = new THREE.LineBasicMaterial({ color: '#fffcf2', transparent: true, opacity: 0.72, depthTest: false })
+            const dandelionTipMaterial = new THREE.PointsMaterial({ color: '#fffcf2', size: constrainedDevice ? 0.038 : 0.046, transparent: true, opacity: 0.92, depthTest: false, sizeAttenuation: true })
+            const dandelionLines = new THREE.LineSegments(dandelionGeometry, dandelionLineMaterial)
+            const dandelionTips = new THREE.Points(dandelionTipGeometry, dandelionTipMaterial)
+            dandelionLines.renderOrder = 3
+            dandelionTips.renderOrder = 3
+            const dandelionStemGeometry = new THREE.BufferGeometry()
+            dandelionStemGeometry.setAttribute('position', new THREE.Float32BufferAttribute([0, -0.98, 0, 0, 0.16, 0], 3))
+            const dandelionStem = new THREE.LineSegments(dandelionStemGeometry, dandelionLineMaterial)
+            dandelionStem.renderOrder = 3
+            dandelionGroup.add(dandelionLines, dandelionTips, dandelionStem)
+            dandelionGroup.scale.setScalar(0.86)
+
             const sphereGeometry = new THREE.SphereGeometry(1.36, constrainedDevice ? 48 : 64, constrainedDevice ? 48 : 64)
             const sphere = new THREE.Mesh(sphereGeometry, glassMaterial)
             const prismShell = new THREE.Mesh(sphereGeometry, prismMaterial)
             prismShell.scale.setScalar(1.004)
-            scrollRig.add(sphere, prismShell)
+            const dandelionCoreGeometry = new THREE.SphereGeometry(0.13, constrainedDevice ? 10 : 16, constrainedDevice ? 10 : 16)
+            const dandelionCoreMaterial = new THREE.MeshPhysicalMaterial({ color: '#ccc5b9', roughness: 0.28, metalness: 0.12, clearcoat: 0.4, transparent: true, opacity: 0.88 })
+            const dandelionCore = new THREE.Mesh(dandelionCoreGeometry, dandelionCoreMaterial)
+            dandelionCore.position.y = 0.16
+            dandelionCore.renderOrder = 3
+            dandelionGroup.add(dandelionCore)
+            scrollRig.add(sphere, prismShell, dandelionGroup)
             scene.add(new THREE.AmbientLight('#fffcf2', 1.1))
             scene.add(new THREE.HemisphereLight('#fffcf2', '#403d39', 1.8))
             const keyLight = new THREE.DirectionalLight('#ffffff', 3.2)
@@ -312,11 +357,14 @@ function App() {
               pointerX += (pointerTargetX - pointerX) * 0.065
               pointerY += (pointerTargetY - pointerY) * 0.065
               prismStrength.value += (prismTarget - prismStrength.value) * 0.08
-              prismTarget *= 0.94
+              prismTarget = Math.max(prismBaseStrength, prismTarget * 0.94)
               const spin = elapsed * 0.32
               sphere.rotation.y = spin + scrollProgress * Math.PI * 0.8 + pointerX * 0.72
               sphere.rotation.x = Math.sin(elapsed * 0.16) * 0.045 + scrollProgress * 0.08 + pointerY * 0.42
               prismShell.rotation.copy(sphere.rotation)
+              dandelionGroup.rotation.y = elapsed * 0.24 + scrollProgress * 0.28
+              dandelionGroup.rotation.x = Math.sin(elapsed * 0.22) * 0.06 + pointerY * 0.12
+              dandelionGroup.rotation.z = Math.cos(elapsed * 0.17) * 0.035
               scene.environmentRotation.y = elapsed * -0.04 + scrollProgress * -0.8 + pointerX * 0.2
               prismAxis.set(
                 0.35 + pointerX * 0.5 + Math.sin(scrollProgress * Math.PI * 1.4) * 0.3,
@@ -334,7 +382,7 @@ function App() {
             }, { threshold: 0.01 })
             visibilityObserver.observe(heroOrbHost)
             renderer.setAnimationLoop(renderHero)
-            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true, onUpdate: (self) => { scrollProgress = self.progress; prismTarget = Math.min(1, Math.abs(self.getVelocity()) / 500) } } })
+            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true, onUpdate: (self) => { scrollProgress = self.progress; prismTarget = Math.min(1, prismBaseStrength + Math.abs(self.getVelocity()) / 360) } } })
               .to(scrollRig.rotation, { y: Math.PI * 1.75, x: Math.PI * 0.26, ease: 'none' }, 0)
               .to(root.rotation, { z: -Math.PI * 0.18, ease: 'none' }, 0)
               .to(scrollRig.position, { x: -0.08, y: -0.16, ease: 'none' }, 0)
@@ -346,8 +394,15 @@ function App() {
               visibilityObserver.disconnect()
               timer.dispose()
               sphere.geometry.dispose()
+              dandelionGeometry.dispose()
+              dandelionTipGeometry.dispose()
+              dandelionStemGeometry.dispose()
+              dandelionCoreGeometry.dispose()
               glassMaterial.dispose()
               prismMaterial.dispose()
+              dandelionLineMaterial.dispose()
+              dandelionTipMaterial.dispose()
+              dandelionCoreMaterial.dispose()
               environmentTarget?.dispose()
               renderer.dispose()
               renderer.domElement.remove()
@@ -378,6 +433,14 @@ function App() {
         gsap.fromTo(card, { y: 42, opacity: 0, filter: 'blur(12px)' }, {
           y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.85, delay: index * 0.05, ease: 'power3.out',
           scrollTrigger: { trigger: card, start: 'top 58%', end: 'bottom 42%', toggleActions: 'play reverse play reverse' },
+        })
+      })
+      gsap.utils.toArray<HTMLElement>('[data-scroll-divider]').forEach((divider) => {
+        gsap.fromTo(divider, { '--divider-progress': 0 }, {
+          '--divider-progress': 1,
+          duration: 0.75,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: divider, start: 'top 78%', toggleActions: 'play reverse play reverse', invalidateOnRefresh: true },
         })
       })
       gsap.fromTo('.timeline__progress', { scaleY: 0 }, { scaleY: 1, transformOrigin: 'top center', ease: 'none', scrollTrigger: { trigger: '.timeline', start: 'top 64%', end: 'bottom 54%', scrub: 0.8 } })
@@ -542,7 +605,7 @@ function App() {
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b><Asterisk aria-hidden="true" /></b></div>
-      <header className="site-nav">
+      <header className="site-nav" data-scroll-divider="bottom">
         <div className="site-nav__brand"><a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a></div>
         <div className="site-nav__meta"><p className="nav-note">Product Engineer<br />based in Kyoto</p></div>
         <nav className="site-nav__actions" aria-label="Main navigation">
@@ -561,7 +624,7 @@ function App() {
           <div className="hero-orb" aria-hidden="true"><div className="hero-orb__canvas" /></div>
         </section>
 
-        <section className="work-section" id="work" aria-labelledby="work-title">
+        <section className="work-section" id="work" aria-labelledby="work-title" data-scroll-divider="top">
           <div className="section-head">
             <div><span className="section-index">01</span><h2 id="work-title">A few things<br />I’ve made.</h2></div>
             <p>Five case studies in product thinking, visual systems and the joy of a well-placed detail.</p>
@@ -571,7 +634,7 @@ function App() {
               <article className={`project-card project-card--${index + 1}`} key={project.number}>
                 <a href={`#project-${project.number}`} className="project-card__link" aria-label={`View ${project.title} case study`} onClick={(event) => { event.preventDefault(); setSelectedProject(project) }}>
                   <ProjectArtwork project={project} />
-                  <div className="project-card__meta"><span>{project.number} / {projectAreas[project.number]}</span><span>{project.year} <ArrowUpRight className="icon-arrow" aria-hidden="true" /></span></div>
+                  <div className="project-card__meta" data-scroll-divider="bottom"><span>{project.number} / {projectAreas[project.number]}</span><span>{project.year} <ArrowUpRight className="icon-arrow" aria-hidden="true" /></span></div>
                   <h3>{project.title}</h3><p>{project.note}</p>
                 </a>
               </article>
@@ -579,7 +642,7 @@ function App() {
           </div>
         </section>
 
-        <section className="about-section" id="about" aria-labelledby="about-title">
+        <section className="about-section" id="about" aria-labelledby="about-title" data-scroll-divider="top">
           <div className="section-index">02</div>
           <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
         </section>
