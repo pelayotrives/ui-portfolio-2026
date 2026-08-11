@@ -19,14 +19,15 @@ type Project = {
   note: string
   className: string
   figmaUrl: string
+  image: string
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share' },
-  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share' },
-  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share' },
-  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share' },
-  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', image: 'projects/octalea_image.png' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', image: 'projects/dealium_image.png' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', image: 'projects/accra_image.png' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', image: 'projects/suenos_de_colores_image.png' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', image: 'projects/floddets_image.png' },
 ]
 
 const projectAreas: Record<string, string> = {
@@ -40,12 +41,7 @@ const projectAreas: Record<string, string> = {
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
   return (
     <div className={`artwork ${project.className}`} aria-hidden="true">
-      <div className="artwork__label">fig. {project.number}</div>
-      <div className="artwork__shape artwork__shape--one" />
-      <div className="artwork__shape artwork__shape--two" />
-      <div className="artwork__shape artwork__shape--three" />
-      <span className="artwork__word">{project.title}</span>
-      <span className="artwork__stamp">FIGMA / UI / 00{project.number}</span>
+      <img src={`${import.meta.env.BASE_URL}${project.image}`} alt="" loading="lazy" decoding="async" />
     </div>
   )
 }
