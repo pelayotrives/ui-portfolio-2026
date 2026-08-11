@@ -466,7 +466,7 @@ function App() {
       if (aboutName) {
         gsap.to(aboutName, {
           color: 'rgba(37, 36, 34, 0)',
-          webkitTextStrokeWidth: '1px',
+          webkitTextStrokeWidth: '0.65px',
           webkitTextStrokeColor: '#252422',
           skewX: -11,
           ease: 'none',
