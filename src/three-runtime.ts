@@ -3,6 +3,7 @@ import {
   AmbientLight,
   CanvasTexture,
   DirectionalLight,
+  DoubleSide,
   EquirectangularReflectionMapping,
   Group,
   HemisphereLight,
@@ -16,9 +17,11 @@ import {
   Scene,
   Shape,
   ShapeGeometry,
+  ShaderMaterial,
   SphereGeometry,
   SRGBColorSpace,
   Timer,
+  Vector3,
   WebGLRenderer,
 } from 'three'
 
@@ -27,6 +30,7 @@ export const THREE = {
   AmbientLight,
   CanvasTexture,
   DirectionalLight,
+  DoubleSide,
   EquirectangularReflectionMapping,
   Group,
   HemisphereLight,
@@ -40,8 +44,10 @@ export const THREE = {
   Scene,
   Shape,
   ShapeGeometry,
+  ShaderMaterial,
   SphereGeometry,
   SRGBColorSpace,
   Timer,
+  Vector3,
   WebGLRenderer,
 }

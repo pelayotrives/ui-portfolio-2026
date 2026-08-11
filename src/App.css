@@ -71,3 +71,12 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .project-viewer__close span { margin: 0; font-size: 1.65rem; line-height: .8; }
 .site-shell:has(.project-viewer) .cursor { z-index: 9999999999; mix-blend-mode: normal; filter: drop-shadow(0 0 2px var(--color-paper)); }
 .site-shell:has(.project-viewer) .cursor-trail { z-index: 9999999998; mix-blend-mode: normal; filter: drop-shadow(0 0 2px var(--color-paper)); }
+
+/* The contact expansion gets a quiet technical grid, inspired by Vercel's depth cues. */
+.contact-section { --contact-grid-opacity: 0; }
+.contact-section::before { content: ""; position: absolute; inset: -8% -4%; z-index: 0; pointer-events: none; opacity: var(--contact-grid-opacity); background-image: linear-gradient(rgba(204, 197, 185, .15) 1px, transparent 1px), linear-gradient(90deg, rgba(204, 197, 185, .15) 1px, transparent 1px); background-size: clamp(38px, 5vw, 76px) clamp(38px, 5vw, 76px); transform: perspective(900px) rotateX(56deg) scale(1.35) translateY(12%); transform-origin: center top; -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 84%, transparent 100%); mask-image: linear-gradient(to bottom, transparent 0%, black 18%, black 84%, transparent 100%); transition: opacity .1s linear; }
+.contact-section > * { position: relative; }
+
+@media (max-width: 700px) {
+  .contact-section::before { background-size: 34px 34px; transform: perspective(700px) rotateX(54deg) scale(1.5) translateY(14%); }
+}

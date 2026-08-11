@@ -197,31 +197,19 @@ function App() {
             scene.add(root)
             const createEnvironment = () => {
               const canvas = document.createElement('canvas')
-              canvas.width = 512
-              canvas.height = 256
+              canvas.width = 384
+              canvas.height = 192
               const context2d = canvas.getContext('2d')
               if (!context2d) return null
               const gradient = context2d.createLinearGradient(0, 0, canvas.width, 0)
               gradient.addColorStop(0, '#403d39')
-              gradient.addColorStop(0.18, '#fff8ee')
-              gradient.addColorStop(0.34, '#ccc5b9')
-              gradient.addColorStop(0.52, '#252422')
-              gradient.addColorStop(0.7, '#eb5e28')
-              gradient.addColorStop(0.84, '#fff5e8')
+              gradient.addColorStop(0.2, '#fffcf2')
+              gradient.addColorStop(0.42, '#ccc5b9')
+              gradient.addColorStop(0.58, '#252422')
+              gradient.addColorStop(0.76, '#fffcf2')
               gradient.addColorStop(1, '#403d39')
               context2d.fillStyle = gradient
               context2d.fillRect(0, 0, canvas.width, canvas.height)
-              context2d.globalCompositeOperation = 'screen'
-              context2d.globalAlpha = 0.32
-              for (let index = 0; index < 5; index += 1) {
-                const x = 40 + index * 120
-                const band = context2d.createLinearGradient(x - 70, 0, x + 70, 0)
-                band.addColorStop(0, 'rgba(255,252,242,0)')
-                band.addColorStop(0.5, 'rgba(255,252,242,0.9)')
-                band.addColorStop(1, 'rgba(255,252,242,0)')
-                context2d.fillStyle = band
-                context2d.fillRect(x - 70, 0, 140, canvas.height)
-              }
               const sourceTexture = new THREE.CanvasTexture(canvas)
               sourceTexture.colorSpace = THREE.SRGBColorSpace
               sourceTexture.mapping = THREE.EquirectangularReflectionMapping
@@ -234,50 +222,59 @@ function App() {
             const environmentTarget = createEnvironment()
             if (environmentTarget) scene.environment = environmentTarget.texture
             const prismPhase = { value: 0 }
+            const prismStrength = { value: 0 }
+            const prismAxis = new THREE.Vector3(0.35, 0.78, 0.52).normalize()
             const glassMaterial = new THREE.MeshPhysicalMaterial({
-            color: '#fffcf2',
-            metalness: 0,
-            roughness: 0.024,
-            transmission: 0.98,
-            thickness: 1.45,
-            ior: 1.42,
-            clearcoat: 1,
-            clearcoatRoughness: 0.02,
-            attenuationDistance: 2.8,
-            attenuationColor: '#fff4eb',
-            reflectivity: 0.72,
-            transparent: true,
-            envMapIntensity: 2.2,
-            opacity: 0.56,
-            iridescence: 0.68,
-            iridescenceIOR: 1.32,
-            iridescenceThicknessRange: [120, 360],
-            depthWrite: false,
-          })
-            glassMaterial.onBeforeCompile = (shader) => {
-              shader.uniforms.uPrismPhase = prismPhase
-              shader.fragmentShader = shader.fragmentShader.replace(
-                '#include <output_fragment>',
-                `
-                  float prismFresnel = pow(1.0 - max(dot(normalize(vNormal), normalize(vViewPosition)), 0.0), 2.2);
-                  vec3 prismSpectrum = 0.5 + 0.5 * cos((prismFresnel * 7.5 + uPrismPhase * 6.2831853) + vec3(0.0, 2.0943951, 4.1887902));
-                  outgoingLight += prismSpectrum * prismFresnel * 0.16;
-                  #include <output_fragment>
-                `,
-              )
-            }
-            glassMaterial.customProgramCacheKey = () => 'hero-prism-v1'
-            const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.36, constrainedDevice ? 48 : 64, constrainedDevice ? 48 : 64), glassMaterial)
-            scrollRig.add(sphere)
-            scene.add(new THREE.AmbientLight('#fffcf2', 1.5))
-            scene.add(new THREE.HemisphereLight('#fffcf2', '#403d39', 2.2))
-            const keyLight = new THREE.DirectionalLight('#ffffff', 3.8)
+              color: '#fffcf2', metalness: 0, roughness: 0.1, transmission: 0.92, thickness: 1.35,
+              ior: 1.45, clearcoat: 0.82, clearcoatRoughness: 0.08, reflectivity: 0.72,
+              transparent: true, envMapIntensity: 1.65, opacity: 0.72, depthWrite: false,
+            })
+            const prismMaterial = new THREE.ShaderMaterial({
+              uniforms: { uPrismAxis: { value: prismAxis }, uPrismPhase: prismPhase, uPrismStrength: prismStrength },
+              vertexShader: `
+                varying vec3 vWorldNormal;
+                varying vec3 vViewNormal;
+                varying vec3 vViewDirection;
+                void main() {
+                  vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+                  vWorldNormal = normalize(mat3(modelMatrix) * normal);
+                  vViewNormal = normalize(normalMatrix * normal);
+                  vViewDirection = normalize(-viewPosition.xyz);
+                  gl_Position = projectionMatrix * viewPosition;
+                }
+              `,
+              fragmentShader: `
+                precision highp float;
+                uniform vec3 uPrismAxis;
+                uniform float uPrismPhase;
+                uniform float uPrismStrength;
+                varying vec3 vWorldNormal;
+                varying vec3 vViewNormal;
+                varying vec3 vViewDirection;
+                void main() {
+                  float incidence = dot(normalize(vWorldNormal), normalize(uPrismAxis));
+                  float field = incidence * 3.8 + uPrismPhase * 6.2831853;
+                  vec3 chroma = 0.5 + 0.5 * cos(field + vec3(0.0, 2.0943951, 4.1887902));
+                  float facing = max(dot(normalize(vViewNormal), normalize(vViewDirection)), 0.0);
+                  float rim = pow(1.0 - facing, 3.6);
+                  float band = smoothstep(0.18, 0.82, 0.5 + 0.5 * sin(field));
+                  float alpha = rim * band * uPrismStrength * 0.2;
+                  gl_FragColor = vec4(mix(vec3(1.0), chroma, 0.72) * alpha, alpha);
+                }
+              `,
+              transparent: true, depthWrite: false, side: THREE.DoubleSide,
+            })
+            const sphereGeometry = new THREE.SphereGeometry(1.36, constrainedDevice ? 48 : 64, constrainedDevice ? 48 : 64)
+            const sphere = new THREE.Mesh(sphereGeometry, glassMaterial)
+            const prismShell = new THREE.Mesh(sphereGeometry, prismMaterial)
+            prismShell.scale.setScalar(1.004)
+            scrollRig.add(sphere, prismShell)
+            scene.add(new THREE.AmbientLight('#fffcf2', 1.1))
+            scene.add(new THREE.HemisphereLight('#fffcf2', '#403d39', 1.8))
+            const keyLight = new THREE.DirectionalLight('#ffffff', 3.2)
             keyLight.position.set(2.6, 3.1, 4.8)
             scene.add(keyLight)
-            const fillLight = new THREE.PointLight('#fff2dc', 3.2, 10, 2)
-            fillLight.position.set(-1.7, 1.9, 2.1)
-            scene.add(fillLight)
-            const rimLight = new THREE.DirectionalLight('#ccc5b9', 1.6)
+            const rimLight = new THREE.DirectionalLight('#ccc5b9', 1.4)
             rimLight.position.set(-3.4, -1.3, 2.4)
             scene.add(rimLight)
             const resize = () => {
@@ -294,6 +291,7 @@ function App() {
             const timer = new THREE.Timer()
             timer.connect(document)
             let scrollProgress = 0
+            let prismTarget = 0
             let pointerX = 0
             let pointerY = 0
             let pointerTargetX = 0
@@ -316,14 +314,19 @@ function App() {
               const elapsed = timer.getElapsed()
               pointerX += (pointerTargetX - pointerX) * 0.065
               pointerY += (pointerTargetY - pointerY) * 0.065
+              prismStrength.value += (prismTarget - prismStrength.value) * 0.08
+              prismTarget *= 0.94
               const spin = elapsed * 0.32
               sphere.rotation.y = spin + scrollProgress * Math.PI * 0.8 + pointerX * 0.72
               sphere.rotation.x = Math.sin(elapsed * 0.16) * 0.045 + scrollProgress * 0.08 + pointerY * 0.42
-              scene.environmentRotation.y = elapsed * -0.18 + scrollProgress * -Math.PI * 1.65 + pointerX * 0.85
-              const prismProgress = Math.sin(elapsed * 0.24 + scrollProgress * Math.PI * 3 + pointerX * 1.8) * 0.5 + 0.5
-              prismPhase.value = prismProgress
-              glassMaterial.iridescenceThicknessRange[0] = 112 + prismProgress * 42
-              glassMaterial.iridescenceThicknessRange[1] = 338 + prismProgress * 68
+              prismShell.rotation.copy(sphere.rotation)
+              scene.environmentRotation.y = elapsed * -0.04 + scrollProgress * -0.8 + pointerX * 0.2
+              prismAxis.set(
+                0.35 + pointerX * 0.5 + Math.sin(scrollProgress * Math.PI * 1.4) * 0.3,
+                0.78 + pointerY * 0.32,
+                0.52 + Math.cos(scrollProgress * Math.PI * 1.4) * 0.34,
+              ).normalize()
+              prismPhase.value = scrollProgress * 0.8 + pointerX * 0.12
               renderer.render(scene, camera)
             }
             const visibilityObserver = new IntersectionObserver(([entry]) => {
@@ -334,7 +337,7 @@ function App() {
             }, { threshold: 0.01 })
             visibilityObserver.observe(heroOrbHost)
             renderer.setAnimationLoop(renderHero)
-            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true, onUpdate: (self) => { scrollProgress = self.progress } } })
+            gsap.timeline({ scrollTrigger: { trigger: '.hero', start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true, onUpdate: (self) => { scrollProgress = self.progress; prismTarget = Math.min(1, Math.abs(self.getVelocity()) / 500) } } })
               .to(scrollRig.rotation, { y: Math.PI * 1.75, x: Math.PI * 0.26, ease: 'none' }, 0)
               .to(root.rotation, { z: -Math.PI * 0.18, ease: 'none' }, 0)
               .to(scrollRig.position, { x: -0.08, y: -0.16, ease: 'none' }, 0)
@@ -347,6 +350,7 @@ function App() {
               timer.dispose()
               sphere.geometry.dispose()
               glassMaterial.dispose()
+              prismMaterial.dispose()
               environmentTarget?.dispose()
               renderer.dispose()
               renderer.domElement.remove()
@@ -430,9 +434,9 @@ function App() {
       })
       gsap.to('.contact-star', { rotation: 360, ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top bottom', end: 'bottom top', scrub: 2 } })
       gsap.fromTo('.contact-section', {
-        '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px',
+        '--contact-extra-height': '0svh', '--contact-offset': '0px', '--contact-top-extra': '0px', '--contact-flow-extra': '0px', '--contact-grid-opacity': 0,
       }, {
-        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px',
+        '--contact-extra-height': '28svh', '--contact-offset': '-82px', '--contact-top-extra': '82px', '--contact-flow-extra': '82px', '--contact-grid-opacity': 0.42,
         ease: 'none', scrollTrigger: { trigger: '.contact-section', start: 'top 85%', end: 'top 10%', scrub: 1, invalidateOnRefresh: true },
       })
       gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: '.contact-section', start: 'top 20%', end: 'top -5%', scrub: 0.45, invalidateOnRefresh: true } })
