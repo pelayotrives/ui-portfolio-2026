@@ -39,6 +39,13 @@ const projectAreas: Record<string, string> = {
   '05': 'Handmade eyewear atelier',
 }
 
+const contactLinks = [
+  { letter: 'A', phrase: 'The classic hello', note: 'A reliable little inbox.', href: 'mailto:pelayotrivespozuelo@gmail.com' },
+  { letter: 'B', phrase: 'Poke me', note: 'Slightly unstructured but useful.', href: 'https://www.linkedin.com/in/pelayo-trives-pozuelo/' },
+  { letter: 'C', phrase: 'My geek side', note: 'Where the nerdy bits live.', href: 'https://github.com/pelayotrives' },
+  { letter: 'D', phrase: 'Currently here', note: 'Probably near a good coffee.', href: 'https://maps.app.goo.gl/H5dVQjXYNSeXa2UT7' },
+]
+
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
   return (
     <div className={`artwork ${project.className}`} aria-hidden="true">
@@ -443,7 +450,7 @@ function App() {
         })
       })
       media.add('(min-width: 701px)', () => {
-        gsap.fromTo('.about-section', { y: 0 }, {
+      gsap.fromTo('.about-section', { y: 0 }, {
           y: () => -Math.min(window.innerHeight * 0.14, 140),
           ease: 'none',
           scrollTrigger: {
@@ -454,6 +461,54 @@ function App() {
             invalidateOnRefresh: true,
           },
         })
+      })
+      media.add('(min-width: 701px)', () => {
+        const panel = document.querySelector<HTMLElement>('.contact-links-section')
+        const innerPanel = panel?.querySelector<HTMLElement>('.contact-links__list')
+        if (!panel || !innerPanel) return undefined
+
+        const measure = () => {
+          panel.style.marginBottom = ''
+          const panelHeight = panel.offsetHeight
+          const innerHeight = innerPanel.scrollHeight
+          const difference = Math.max(0, innerHeight - panelHeight)
+          const fakeScrollRatio = difference > 0 ? difference / (difference + panelHeight) : 0
+          if (fakeScrollRatio) panel.style.marginBottom = `${innerHeight * fakeScrollRatio}px`
+          return { difference, fakeScrollRatio, innerHeight }
+        }
+
+        let metrics = measure()
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: panel,
+            start: 'bottom bottom',
+            end: () => metrics.difference > 0 ? `+=${innerPanel.scrollHeight}` : 'bottom top',
+            pin: true,
+            pinSpacing: false,
+            scrub: true,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        if (metrics.difference > 0) {
+          timeline.to(innerPanel, {
+            y: () => -metrics.difference,
+            duration: 1 / (1 - metrics.fakeScrollRatio) - 1,
+            ease: 'none',
+          })
+        }
+        timeline.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.96, opacity: 0.94, duration: 0.9, ease: 'none' })
+          .to(panel, { opacity: 0, duration: 0.1, ease: 'none' })
+
+        const handleResize = () => {
+          metrics = measure()
+          ScrollTrigger.refresh()
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+          window.removeEventListener('resize', handleResize)
+          panel.style.marginBottom = ''
+        }
       })
       gsap.fromTo('.timeline__progress', { scaleY: 0 }, { scaleY: 1, transformOrigin: 'top center', ease: 'none', scrollTrigger: { trigger: '.timeline', start: 'top 64%', end: 'bottom 54%', scrub: 0.8 } })
       gsap.utils.toArray<HTMLElement>('.timeline__dot').forEach((dot) => {
@@ -541,12 +596,14 @@ function App() {
     const cursorTrails = gsap.utils.toArray<HTMLElement>('.cursor-trail')
     const contactSection = document.querySelector<HTMLElement>('.contact-section')
     const contactTitle = document.querySelector<HTMLElement>('.contact-title-wrap')
+    const contactLinkElements = gsap.utils.toArray<HTMLElement>('[data-contact-link]')
     const hasPointer = window.matchMedia('(pointer: fine)').matches
     let onMove: ((event: PointerEvent) => void) | undefined
     let onOver: ((event: PointerEvent) => void) | undefined
     let onContactLeave: (() => void) | undefined
     let onWindowLeave: (() => void) | undefined
     let interactive = false
+    let activeContactLink: HTMLElement | undefined
 
     if (cursor && cursorCore && cursorOrbit && hasPointer && !prefersReducedMotion) {
       const moveX = gsap.quickTo(cursor, 'x', { duration: 0.24, ease: 'power3.out' })
@@ -571,6 +628,28 @@ function App() {
           })
         })
         setInteractive(Boolean((event.target as Element).closest('a, button')))
+        const contactLink = (event.target as Element).closest<HTMLElement>('[data-contact-link]') ?? undefined
+        if (contactLink !== activeContactLink) {
+          if (activeContactLink) {
+            activeContactLink.classList.remove('contact-link--active')
+            const previousPhrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
+            if (previousPhrase) gsap.to(previousPhrase, { '--contact-radius': '0px', duration: 0.28, ease: 'power2.out', overwrite: true })
+          }
+          activeContactLink = contactLink
+          if (activeContactLink) {
+            activeContactLink.classList.add('contact-link--active')
+            const currentPhrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
+            if (currentPhrase) gsap.to(currentPhrase, { '--contact-radius': '46px', duration: 0.42, ease: 'power3.out', overwrite: true })
+          }
+        }
+        if (contactLink) {
+          const phrase = contactLink.querySelector<HTMLElement>('.contact-link__phrase')
+          if (phrase) {
+            const phraseBounds = phrase.getBoundingClientRect()
+            phrase.style.setProperty('--contact-x', `${event.clientX - phraseBounds.left}px`)
+            phrase.style.setProperty('--contact-y', `${event.clientY - phraseBounds.top}px`)
+          }
+        }
         if (contactSection && contactTitle) {
           const bounds = contactSection.getBoundingClientRect()
           const inside = event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom
@@ -587,7 +666,15 @@ function App() {
       }
       window.addEventListener('pointermove', onMove)
       window.addEventListener('pointerover', onOver)
-      onWindowLeave = () => setInteractive(false)
+      onWindowLeave = () => {
+        setInteractive(false)
+        if (activeContactLink) {
+          activeContactLink.classList.remove('contact-link--active')
+          const phrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
+          if (phrase) gsap.to(phrase, { '--contact-radius': '0px', duration: 0.28, ease: 'power2.out', overwrite: true })
+          activeContactLink = undefined
+        }
+      }
       window.addEventListener('pointerleave', onWindowLeave)
       onContactLeave = () => contactTitle?.classList.remove('contact-title-wrap--active')
       contactSection?.addEventListener('pointerleave', onContactLeave)
@@ -609,6 +696,7 @@ function App() {
       if (onOver) window.removeEventListener('pointerover', onOver)
       if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
       if (onContactLeave) contactSection?.removeEventListener('pointerleave', onContactLeave)
+      contactLinkElements.forEach((link) => gsap.killTweensOf(link))
     }
   }, [])
 
@@ -657,6 +745,19 @@ function App() {
         <section className="about-section" id="about" aria-labelledby="about-title" data-scroll-divider="top">
           <div className="section-index">02</div>
           <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
+        </section>
+
+        <section className="contact-links-section" id="contact" aria-labelledby="contact-links-title" data-scroll-divider="top">
+          <h2 id="contact-links-title" className="sr-only">Contact Pelayo Trives</h2>
+          <div className="contact-links__list">
+            {contactLinks.map((link) => (
+              <a className="contact-link" data-contact-link data-scroll-divider="bottom" href={link.href} key={link.letter} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel={link.href.startsWith('mailto:') ? undefined : 'noreferrer'}>
+                <span className="contact-link__number">{link.letter}</span>
+                <span className="contact-link__phrase"><span className="contact-link__base">{link.phrase}</span><span className="contact-link__hover" aria-hidden="true">{link.phrase}</span></span>
+                <span className="contact-link__note">{link.note}</span>
+              </a>
+            ))}
+          </div>
         </section>
 
         <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true"><Asterisk className="contact-star__icon" /></div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></section>

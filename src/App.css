@@ -104,3 +104,41 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   .contact-section::before { background-size: 34px 34px; transform: perspective(700px) rotateX(54deg) scale(1.5) translateY(14%); }
   .contact-section > .contact-star { top: 31%; right: 5%; font-size: 7rem; }
 }
+
+/* Contact links: a pinned editorial index with a small ink-inversion lens. */
+.contact-links-section { position: relative; z-index: 4; min-height: 100svh; height: 100svh; margin: 0; padding: 0; background: var(--color-paper); color: var(--color-ink); overflow: hidden; }
+.contact-links__intro { max-width: 560px; margin-bottom: clamp(3rem, 7vw, 6rem); }
+.contact-links__intro h2 { margin: 1.2rem 0 1.6rem; font: var(--text-section) var(--font-display); font-size: clamp(3rem, 6vw, 6.4rem); line-height: .88; letter-spacing: -.065em; font-weight: 500; }
+.contact-links__intro h2 em { color: var(--color-accent-deep); font-style: italic; }
+.contact-links__intro p { max-width: 360px; margin: 0; color: var(--color-muted); font-size: .9rem; line-height: 1.5; }
+.contact-links__list { min-width: 0; padding: 8rem 0 10rem; opacity: 1; }
+.contact-link { --contact-radius: 0px; --contact-x: 50%; --contact-y: 50%; position: relative; display: grid; grid-template-columns: 3rem minmax(0, 1fr) minmax(180px, .65fr); align-items: center; gap: clamp(.75rem, 2vw, 2rem); min-height: clamp(100px, 12vw, 170px); padding: 1.25rem 0; color: var(--color-ink); text-decoration: none; }
+.contact-link__number, .contact-link__note { font: var(--text-micro); text-transform: uppercase; letter-spacing: .07em; }
+.contact-link__number { align-self: start; padding-top: .35rem; color: var(--color-accent-deep); }
+.contact-link__phrase { position: relative; min-width: 0; font: clamp(2.5rem, 6vw, 6.4rem)/.86 var(--font-display); letter-spacing: -.075em; }
+.contact-link__base, .contact-link__hover { display: block; }
+.contact-link__base { position: relative; z-index: 1; }
+.contact-link__phrase::before { content: ""; position: absolute; z-index: 2; width: calc(var(--contact-radius) * 2); height: calc(var(--contact-radius) * 2); left: calc(var(--contact-x) - var(--contact-radius)); top: calc(var(--contact-y) - var(--contact-radius)); border-radius: 50%; background: var(--color-ink); opacity: 0; pointer-events: none; transition: opacity .2s ease-out; }
+.contact-link__hover { position: absolute; z-index: 3; inset: 0; color: var(--color-paper); pointer-events: none; clip-path: circle(var(--contact-radius) at var(--contact-x) var(--contact-y)); -webkit-clip-path: circle(var(--contact-radius) at var(--contact-x) var(--contact-y)); }
+.contact-link__note { justify-self: end; max-width: 240px; color: var(--color-muted); line-height: 1.4; text-align: right; text-transform: none; letter-spacing: 0; }
+.contact-link--active .contact-link__phrase::before { opacity: 1; }
+.contact-links-section[data-scroll-divider]::before, .contact-link[data-scroll-divider]::after { background: var(--color-line); }
+.contact-links-section[data-scroll-divider]::before, .contact-link[data-scroll-divider]::after { left: 0; right: 0; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+@media (max-width: 700px) {
+  .contact-links-section { min-height: auto; height: auto; padding: 5rem 0 6rem; overflow: visible; }
+  .contact-links__list { padding: 0; }
+  .contact-links__intro { max-width: 100%; margin-bottom: 4rem; }
+  .contact-links__intro p { max-width: 270px; }
+  .contact-links__list { opacity: 1; }
+  .contact-link { grid-template-columns: 2rem minmax(0, 1fr); gap: .7rem; min-height: 118px; }
+  .contact-link__phrase { font-size: clamp(2.15rem, 10vw, 4rem); line-height: 1.1; }
+  .contact-link__note { grid-column: 2; justify-self: start; max-width: 270px; margin-top: -.25rem; text-align: left; }
+  .contact-link__phrase::before, .contact-link__hover { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-links__list { opacity: 1; }
+  .contact-link__phrase::before, .contact-link__hover { display: none; }
+}
