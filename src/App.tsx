@@ -96,12 +96,28 @@ function App() {
     const updateLenis = (time: number) => lenis.raf(time * 1000)
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nav = document.querySelector<HTMLElement>('.site-nav')
+    const scrollProgressFill = document.querySelector<HTMLElement>('.scroll-progress__fill')
     const setNavScrolled = (scrolled: boolean) => nav?.classList.toggle('site-nav--scrolled', scrolled)
-    const handleScroll = ({ scroll }: { scroll: number }) => setNavScrolled(scroll > 18)
-    const handleNativeScroll = () => setNavScrolled(window.scrollY > 18)
+    const updateScrollProgress = (scroll: number) => {
+      const maximumScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+      const progress = Math.min(1, Math.max(0, scroll / maximumScroll))
+      if (scrollProgressFill) {
+        gsap.set(scrollProgressFill, { scaleX: progress })
+        scrollProgressFill.parentElement?.setAttribute('aria-valuenow', `${Math.round(progress * 100)}`)
+      }
+    }
+    const handleScroll = ({ scroll }: { scroll: number }) => {
+      setNavScrolled(scroll > 18)
+      updateScrollProgress(scroll)
+    }
+    const handleNativeScroll = () => {
+      setNavScrolled(window.scrollY > 18)
+      updateScrollProgress(window.scrollY)
+    }
     lenis.on('scroll', ScrollTrigger.update)
     lenis.on('scroll', handleScroll)
     window.addEventListener('scroll', handleNativeScroll, { passive: true })
+    updateScrollProgress(window.scrollY)
     gsap.ticker.add(updateLenis)
     gsap.ticker.lagSmoothing(0)
     let disposeLoaderScene: (() => void) | undefined
@@ -450,17 +466,52 @@ function App() {
         })
       })
       media.add('(min-width: 701px)', () => {
-      gsap.fromTo('.about-section', { y: 0 }, {
-          y: () => -Math.min(window.innerHeight * 0.14, 140),
-          ease: 'none',
+        const panel = document.querySelector<HTMLElement>('.about-section')
+        const innerPanel = panel?.querySelector<HTMLElement>('.about-panel__inner')
+        if (!panel || !innerPanel) return undefined
+
+        const measure = () => {
+          panel.style.marginBottom = ''
+          const panelHeight = panel.offsetHeight
+          const innerHeight = innerPanel.scrollHeight
+          const difference = Math.max(0, innerHeight - panelHeight)
+          const fakeScrollRatio = difference > 0 ? difference / (difference + panelHeight) : 0
+          if (fakeScrollRatio) panel.style.marginBottom = `${innerHeight * fakeScrollRatio}px`
+          return { difference, fakeScrollRatio, innerHeight }
+        }
+
+        let metrics = measure()
+        const timeline = gsap.timeline({
           scrollTrigger: {
-            trigger: '.work-section',
+            trigger: panel,
             start: 'bottom bottom',
-            end: 'bottom top+=82',
-            scrub: 1.1,
+            end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
+            pin: true,
+            pinSpacing: false,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         })
+
+        if (metrics.difference > 0) {
+          timeline.to(innerPanel, {
+            y: () => -metrics.difference,
+            duration: 1 / (1 - metrics.fakeScrollRatio) - 1,
+            ease: 'none',
+          })
+        }
+        timeline.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.96, opacity: 0.94, duration: 0.9, ease: 'none' })
+          .to(panel, { opacity: 0, duration: 0.1, ease: 'none' })
+
+        const handleResize = () => {
+          metrics = measure()
+          ScrollTrigger.refresh()
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+          window.removeEventListener('resize', handleResize)
+          panel.style.marginBottom = ''
+        }
       })
       media.add('(min-width: 701px)', () => {
         const panel = document.querySelector<HTMLElement>('.contact-links-section')
@@ -703,6 +754,7 @@ function App() {
   return (
     <div className="site-shell" ref={pageRef}>
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
+      <div className="scroll-progress" role="progressbar" aria-label="Page scroll progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}><span className="scroll-progress__fill" /></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b><Asterisk aria-hidden="true" /></b></div>
       <header className="site-nav" data-scroll-divider="bottom">
@@ -743,8 +795,10 @@ function App() {
         </section>
 
         <section className="about-section" id="about" aria-labelledby="about-title" data-scroll-divider="top">
-          <div className="section-index">02</div>
-          <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
+          <div className="about-panel__inner">
+            <div className="section-index">02</div>
+            <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
+          </div>
         </section>
 
         <section className="contact-links-section" id="contact" aria-labelledby="contact-links-title" data-scroll-divider="top">
