@@ -679,18 +679,19 @@ function App() {
           })
         })
         setInteractive(Boolean((event.target as Element).closest('a, button')))
-        const contactLink = (event.target as Element).closest<HTMLElement>('[data-contact-link]') ?? undefined
+        const hoveredPhrase = (event.target as Element).closest<HTMLElement>('.contact-link__phrase')
+        const contactLink = hoveredPhrase?.closest<HTMLElement>('[data-contact-link]') ?? undefined
         if (contactLink !== activeContactLink) {
           if (activeContactLink) {
             activeContactLink.classList.remove('contact-link--active')
             const previousPhrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
-            if (previousPhrase) gsap.to(previousPhrase, { '--contact-radius': '0px', duration: 0.28, ease: 'power2.out', overwrite: true })
+            if (previousPhrase) gsap.to(previousPhrase, { '--contact-radius': '0px', letterSpacing: '-0.075em', duration: 0.32, ease: 'power2.out', overwrite: true })
           }
           activeContactLink = contactLink
           if (activeContactLink) {
             activeContactLink.classList.add('contact-link--active')
             const currentPhrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
-            if (currentPhrase) gsap.to(currentPhrase, { '--contact-radius': '46px', duration: 0.42, ease: 'power3.out', overwrite: true })
+            if (currentPhrase) gsap.to(currentPhrase, { '--contact-radius': '30px', letterSpacing: '-0.02em', duration: 0.42, ease: 'power3.out', overwrite: true })
           }
         }
         if (contactLink) {
@@ -722,7 +723,7 @@ function App() {
         if (activeContactLink) {
           activeContactLink.classList.remove('contact-link--active')
           const phrase = activeContactLink.querySelector<HTMLElement>('.contact-link__phrase')
-          if (phrase) gsap.to(phrase, { '--contact-radius': '0px', duration: 0.28, ease: 'power2.out', overwrite: true })
+          if (phrase) gsap.to(phrase, { '--contact-radius': '0px', letterSpacing: '-0.075em', duration: 0.32, ease: 'power2.out', overwrite: true })
           activeContactLink = undefined
         }
       }
