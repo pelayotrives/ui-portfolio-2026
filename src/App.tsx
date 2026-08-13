@@ -23,12 +23,27 @@ type Project = {
   image: string
 }
 
+type Extension = {
+  title: string
+  note: string
+  image: string
+  href: string
+  categories: Array<'Design' | 'Utility' | 'MGMT' | 'Creativity'>
+}
+
 const projects: Project[] = [
   { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', image: 'projects/octalea_image.png' },
   { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', image: 'projects/dealium_image.png' },
   { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', image: 'projects/accra_image.png' },
   { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', image: 'projects/suenos_de_colores_image.png' },
   { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', image: 'projects/floddets_image.png' },
+]
+
+const extensions: Extension[] = [
+  { title: 'Extensio Patronus', note: 'A control panel for keeping every browser extension in one tidy place.', image: 'projects/extensio_patronus_image.png', href: 'https://chromewebstore.google.com/detail/extensio-patronus/ocmdlafnolpcdjjlbiabhiljojkjoolm', categories: ['MGMT', 'Utility'] },
+  { title: 'Crop & Convert', note: 'Bulk image exports with preset and custom crops for social formats.', image: 'projects/crop_and_convert_image.png', href: 'https://chromewebstore.google.com/detail/crop-convert/ikjkgiblokpgjfmkmogedlfdhkigicpb', categories: ['Design', 'Utility'] },
+  { title: 'Buttonizer', note: 'A browser library for collecting and reusing custom buttons from the web.', image: 'projects/buttonizer_image.png', href: 'https://chromewebstore.google.com/detail/buttonizer/cghjhagffajljkdapabcnbdnadllmkcp', categories: ['Creativity', 'Design'] },
+  { title: 'Make Me Useful', note: 'A Pomodoro-style page blocker for staying with the task at hand.', image: 'projects/make_me_useful_image.png', href: 'https://chromewebstore.google.com/detail/make-me-useful/pacfhmmocmgdknbnabhgipcfkjjehmla', categories: ['Utility', 'MGMT'] },
 ]
 
 const projectAreas: Record<string, string> = {
@@ -458,6 +473,61 @@ function App() {
           scrollTrigger: { trigger: card, start: 'top 58%', end: 'bottom 42%', toggleActions: 'play reverse play reverse' },
         })
       })
+      media.add('(min-width: 701px)', () => {
+        const stage = document.querySelector<HTMLElement>('.extension-grid')
+        const track = stage?.querySelector<HTMLElement>('.extension-track')
+        const firstCard = track?.querySelector<HTMLElement>('.extension-card')
+        if (!stage || !track || !firstCard) return undefined
+
+        const getCardShift = () => {
+          const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
+          return -(firstCard.getBoundingClientRect().width + gap)
+        }
+
+        const tween = gsap.to(track, {
+          x: getCardShift,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: stage,
+            start: 'top top+=104',
+            end: () => `+=${Math.max(window.innerHeight * 0.9, 620)}`,
+            pin: true,
+            scrub: 0.9,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        return () => tween.kill()
+      })
+      media.add('(max-width: 700px) and (prefers-reduced-motion: no-preference)', () => {
+        const stage = document.querySelector<HTMLElement>('.extension-grid')
+        const track = stage?.querySelector<HTMLElement>('.extension-track')
+        const firstCard = track?.querySelector<HTMLElement>('.extension-card')
+        const cards = gsap.utils.toArray<HTMLElement>('.extension-card')
+        if (!stage || !track || !firstCard || cards.length < 2) return undefined
+
+        const getCardShift = () => {
+          const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
+          return firstCard.getBoundingClientRect().width + gap
+        }
+
+        const tween = gsap.to(track, {
+          x: () => -getCardShift() * (cards.length - 1),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: stage,
+            start: 'top top+=84',
+            end: () => `+=${Math.max(window.innerHeight * 1.05, 560) * (cards.length - 1)}`,
+            pin: true,
+            scrub: 0.9,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        return () => tween.kill()
+      })
       gsap.utils.toArray<HTMLElement>('[data-scroll-divider]').forEach((divider) => {
         gsap.fromTo(divider, { '--divider-progress': 0 }, {
           '--divider-progress': 1,
@@ -558,6 +628,98 @@ function App() {
         window.addEventListener('resize', handleResize)
         return () => {
           window.removeEventListener('resize', handleResize)
+          panel.style.marginBottom = ''
+        }
+      })
+      media.add('(max-width: 700px) and (prefers-reduced-motion: no-preference)', () => {
+        const panel = document.querySelector<HTMLElement>('.about-section')
+        const innerPanel = panel?.querySelector<HTMLElement>('.about-panel__inner')
+        if (!panel || !innerPanel) return undefined
+
+        const measure = () => {
+          panel.style.height = '100svh'
+          panel.style.overflow = 'hidden'
+          panel.style.marginBottom = ''
+          const difference = Math.max(0, innerPanel.scrollHeight - window.innerHeight)
+          const transitionDistance = Math.max(window.innerHeight * 0.72, difference + window.innerHeight * 0.22)
+          panel.style.marginBottom = `${transitionDistance}px`
+          return { difference, transitionDistance }
+        }
+
+        let metrics = measure()
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: panel,
+            start: 'top top',
+            end: () => `+=${metrics.transitionDistance}`,
+            pin: true,
+            pinSpacing: false,
+            scrub: 0.85,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        if (metrics.difference > 0) {
+          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 0.72, ease: 'none' })
+        }
+        timeline.to(panel, { scale: 0.975, opacity: 0.94, duration: 0.28, ease: 'none' })
+
+        const handleResize = () => {
+          metrics = measure()
+          ScrollTrigger.refresh()
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+          window.removeEventListener('resize', handleResize)
+          panel.style.height = ''
+          panel.style.overflow = ''
+          panel.style.marginBottom = ''
+        }
+      })
+      media.add('(max-width: 700px)', () => {
+        const panel = document.querySelector<HTMLElement>('.contact-links-section')
+        const innerPanel = panel?.querySelector<HTMLElement>('.contact-links__list')
+        if (!panel || !innerPanel) return undefined
+
+        const measure = () => {
+          panel.style.height = '100svh'
+          panel.style.overflow = 'hidden'
+          panel.style.marginBottom = ''
+          const difference = Math.max(0, innerPanel.scrollHeight - window.innerHeight)
+          const transitionDistance = Math.max(window.innerHeight * 0.58, difference + window.innerHeight * 0.18)
+          panel.style.marginBottom = `${transitionDistance}px`
+          return { difference, transitionDistance }
+        }
+
+        let metrics = measure()
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: panel,
+            start: 'top top',
+            end: () => `+=${metrics.transitionDistance}`,
+            pin: true,
+            pinSpacing: false,
+            scrub: 0.85,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        if (metrics.difference > 0) {
+          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 0.72, ease: 'none' })
+        }
+        timeline.to(panel, { scale: 0.975, opacity: 0.94, duration: 0.28, ease: 'none' })
+
+        const handleResize = () => {
+          metrics = measure()
+          ScrollTrigger.refresh()
+        }
+        window.addEventListener('resize', handleResize)
+        return () => {
+          window.removeEventListener('resize', handleResize)
+          panel.style.height = ''
+          panel.style.overflow = ''
           panel.style.marginBottom = ''
         }
       })
@@ -792,6 +954,22 @@ function App() {
                 </a>
               </article>
             ))}
+          </div>
+          <div className="extension-work" data-scroll-divider="top">
+            <div className="extension-work__heading">
+              <div><span className="section-index">browser tools</span><h3>Small utilities,<br />built to help.</h3></div>
+              <p>A growing collection of small tools for the everyday frictions worth smoothing out.</p>
+            </div>
+            <div className="extension-grid">
+              <div className="extension-track">
+                {extensions.map((extension) => (
+                  <a className="extension-card" href={extension.href} key={extension.title} target="_blank" rel="noreferrer" aria-label={`Open ${extension.title} in Chrome Web Store`}>
+                    <img src={`${import.meta.env.BASE_URL}${extension.image}`} alt="" loading="lazy" decoding="async" />
+                    <div className="extension-card__body"><div className="extension-card__copy"><h4>{extension.title}</h4><p>{extension.note}</p></div><div className="extension-card__badges">{extension.categories.map((category) => <span className={`extension-badge extension-badge--${category.toLowerCase()}`} key={category}>{category}</span>)}</div><div className="extension-card__footer"><span className="extension-card__cta">Go to extension <ArrowUpRight className="icon-arrow" aria-hidden="true" /></span></div></div>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
 
