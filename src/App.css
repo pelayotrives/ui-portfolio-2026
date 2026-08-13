@@ -138,12 +138,12 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 @media (max-width: 700px) {
   .about-section { padding: 0; overflow: visible; }
   .about-panel__inner { display: grid; grid-template-columns: 1fr; gap: 0; padding: 5rem 0 6rem; }
-  .contact-links-section { min-height: auto; height: auto; padding: 5rem 0 6rem; overflow: visible; }
-  .contact-links__list { padding: 0; }
+  .contact-links-section { min-height: 100svh; height: 100svh; padding: 0; overflow: hidden; }
+  .contact-links__list { padding: 5.5rem 0 6rem; }
   .contact-links__intro { max-width: 100%; margin-bottom: 4rem; }
   .contact-links__intro p { max-width: 270px; }
   .contact-links__list { opacity: 1; }
-  .contact-link { grid-template-columns: 2rem minmax(0, 1fr); gap: .7rem; min-height: 118px; }
+  .contact-link { grid-template-columns: 2rem minmax(0, 1fr); gap: .7rem; min-height: 118px; padding-block: 1.15rem; }
   .contact-link__phrase { font-size: clamp(2.15rem, 10vw, 4rem); line-height: 1.1; }
   .contact-link__note { grid-column: 2; justify-self: start; max-width: 270px; margin-top: -.25rem; text-align: left; }
   .contact-link__phrase::before, .contact-link__hover { display: none; }

@@ -640,30 +640,32 @@ function App() {
           panel.style.height = '100svh'
           panel.style.overflow = 'hidden'
           panel.style.marginBottom = ''
-          const difference = Math.max(0, innerPanel.scrollHeight - window.innerHeight)
-          const transitionDistance = Math.max(window.innerHeight * 0.72, difference + window.innerHeight * 0.22)
-          panel.style.marginBottom = `${transitionDistance}px`
-          return { difference, transitionDistance }
+          const panelHeight = panel.offsetHeight
+          const innerHeight = innerPanel.scrollHeight
+          const difference = Math.max(0, innerHeight - panelHeight)
+          const fakeScrollRatio = difference > 0 ? difference / (difference + panelHeight) : 0
+          if (fakeScrollRatio) panel.style.marginBottom = `${innerHeight * fakeScrollRatio}px`
+          return { difference, fakeScrollRatio, innerHeight }
         }
 
         let metrics = measure()
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'top top',
-            end: () => `+=${metrics.transitionDistance}`,
+            start: 'bottom bottom',
+            end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
-            scrub: 0.85,
-            anticipatePin: 1,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         })
 
         if (metrics.difference > 0) {
-          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 0.72, ease: 'none' })
+          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 1 / (1 - metrics.fakeScrollRatio) - 1, ease: 'none' })
         }
-        timeline.to(panel, { scale: 0.975, opacity: 0.94, duration: 0.28, ease: 'none' })
+        timeline.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.96, opacity: 0.94, duration: 0.9, ease: 'none' })
+          .to(panel, { opacity: 0, duration: 0.1, ease: 'none' })
 
         const handleResize = () => {
           metrics = measure()
@@ -677,7 +679,7 @@ function App() {
           panel.style.marginBottom = ''
         }
       })
-      media.add('(max-width: 700px)', () => {
+      media.add('(max-width: 700px) and (prefers-reduced-motion: no-preference)', () => {
         const panel = document.querySelector<HTMLElement>('.contact-links-section')
         const innerPanel = panel?.querySelector<HTMLElement>('.contact-links__list')
         if (!panel || !innerPanel) return undefined
@@ -686,30 +688,32 @@ function App() {
           panel.style.height = '100svh'
           panel.style.overflow = 'hidden'
           panel.style.marginBottom = ''
-          const difference = Math.max(0, innerPanel.scrollHeight - window.innerHeight)
-          const transitionDistance = Math.max(window.innerHeight * 0.58, difference + window.innerHeight * 0.18)
-          panel.style.marginBottom = `${transitionDistance}px`
-          return { difference, transitionDistance }
+          const panelHeight = panel.offsetHeight
+          const innerHeight = innerPanel.scrollHeight
+          const difference = Math.max(0, innerHeight - panelHeight)
+          const fakeScrollRatio = difference > 0 ? difference / (difference + panelHeight) : 0
+          if (fakeScrollRatio) panel.style.marginBottom = `${innerHeight * fakeScrollRatio}px`
+          return { difference, fakeScrollRatio, innerHeight }
         }
 
         let metrics = measure()
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'top top',
-            end: () => `+=${metrics.transitionDistance}`,
+            start: 'bottom bottom',
+            end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
-            scrub: 0.85,
-            anticipatePin: 1,
+            scrub: true,
             invalidateOnRefresh: true,
           },
         })
 
         if (metrics.difference > 0) {
-          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 0.72, ease: 'none' })
+          timeline.to(innerPanel, { y: () => -metrics.difference, duration: 1 / (1 - metrics.fakeScrollRatio) - 1, ease: 'none' })
         }
-        timeline.to(panel, { scale: 0.975, opacity: 0.94, duration: 0.28, ease: 'none' })
+        timeline.fromTo(panel, { scale: 1, opacity: 1 }, { scale: 0.96, opacity: 0.94, duration: 0.9, ease: 'none' })
+          .to(panel, { opacity: 0, duration: 0.1, ease: 'none' })
 
         const handleResize = () => {
           metrics = measure()
