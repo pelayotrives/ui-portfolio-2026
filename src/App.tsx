@@ -518,6 +518,43 @@ function App() {
         yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
         scrollTrigger: { trigger: '.hero h1', start: 'top 58%', end: 'bottom 44%', toggleActions: 'play reverse play reverse' },
       })
+      media.add('(prefers-reduced-motion: no-preference)', () => {
+        const hero = document.querySelector<HTMLElement>('.hero')
+        const orb = hero?.querySelector<HTMLElement>('.hero-orb')
+        if (!hero || !orb) return undefined
+
+        const getOrbTarget = () => ({
+          x: window.innerWidth / 2 - (hero.getBoundingClientRect().left + orb.offsetLeft + orb.offsetWidth / 2),
+          y: hero.offsetHeight - window.innerHeight / 2 - (orb.offsetTop + orb.offsetHeight / 2),
+        })
+        const getPortalRadius = () => Math.ceil(Math.hypot(window.innerWidth, window.innerHeight))
+        const getOrbScale = () => Math.min(window.matchMedia('(max-width: 700px)').matches ? 4.25 : 5.25, Math.max(3.2, getPortalRadius() / Math.max(orb.offsetWidth, 1) * 0.55))
+        const heroContent = [
+          ...gsap.utils.toArray<HTMLElement>('.hero__eyebrow, .hero__title-line, .hero__aside, .hero__scroll'),
+        ]
+
+        const portal = gsap.timeline({
+          scrollTrigger: {
+            trigger: hero,
+            start: 'bottom bottom',
+            end: () => `+=${Math.max(window.innerHeight * 1.15, 860)}`,
+            pin: true,
+            pinSpacing: false,
+            scrub: 0.85,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        })
+
+        portal
+          .to(heroContent, { y: -44, autoAlpha: 0, duration: 0.34, ease: 'none', stagger: 0.015 }, 0)
+          .to(orb, { x: () => getOrbTarget().x, y: () => getOrbTarget().y, scale: 1.22, duration: 0.42, ease: 'none' }, 0)
+          .to(hero, { '--hero-portal': () => `${Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.18)}px`, duration: 0.16, ease: 'none' }, 0.42)
+          .to(orb, { scale: getOrbScale, autoAlpha: 0, duration: 0.58, ease: 'none' }, 0.42)
+          .to(hero, { '--hero-portal': () => `${getPortalRadius()}px`, duration: 0.58, ease: 'none' }, 0.42)
+
+        return () => portal.kill()
+      })
       gsap.utils.toArray<HTMLElement>('.project-card').forEach((card, index) => {
         gsap.fromTo(card, { y: 42, opacity: 0, filter: 'blur(12px)' }, {
           y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.85, delay: index * 0.05, ease: 'power3.out',
