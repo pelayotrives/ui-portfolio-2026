@@ -516,7 +516,6 @@ function App() {
       })
       gsap.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
         yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
-        scrollTrigger: { trigger: '.hero h1', start: 'top 58%', end: 'bottom 44%', toggleActions: 'play reverse play reverse' },
       })
       media.add('(min-width: 1280px) and (prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector<HTMLElement>('.hero')
@@ -538,7 +537,7 @@ function App() {
         const getPortalRadius = () => Math.ceil(Math.hypot(window.innerWidth, window.innerHeight))
         const getOrbScale = () => Math.min(2.9, Math.max(2.3, getPortalRadius() / Math.max(orb.offsetWidth, 1) * 0.32))
         const heroContent = [
-          ...gsap.utils.toArray<HTMLElement>('.hero__eyebrow, .hero__title-line, .hero__aside, .hero__scroll'),
+          ...gsap.utils.toArray<HTMLElement>('.hero__eyebrow, .hero__title-line'),
         ]
 
         const portal = gsap.timeline({
@@ -1051,8 +1050,6 @@ function App() {
         <section className="hero" aria-labelledby="hero-title">
           <div className="hero__eyebrow"><span className="dot" /> Pelayo Trives | Product Engineer</div>
           <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
-          <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences, with a soft spot for the strange bits.</p>
-          <a className="hero__scroll" href="#work"><span>Scroll to explore</span><span className="arrow">↓</span></a>
           <div className="hero-orb" aria-hidden="true"><div className="hero-orb__canvas" /></div>
         </section>
 
