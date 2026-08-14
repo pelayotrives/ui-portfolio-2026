@@ -524,10 +524,9 @@ function App() {
         const portalOverlay = document.querySelector<HTMLElement>('.hero-portal-overlay')
         if (!hero || !orb || !portalOverlay) return undefined
 
-        const portalStartViewport = 0.82
         const getPortalOrigin = () => ({
           x: window.innerWidth / 2 - hero.getBoundingClientRect().left,
-          y: hero.offsetHeight - window.innerHeight * (portalStartViewport - 0.5),
+          y: window.innerHeight / 2 - hero.getBoundingClientRect().top,
         })
         const getOrbTarget = () => {
           const origin = getPortalOrigin()
@@ -545,7 +544,7 @@ function App() {
         const portal = gsap.timeline({
           scrollTrigger: {
             trigger: hero,
-            start: 'bottom 82%',
+            start: 'top top',
             end: () => `+=${Math.max(window.innerHeight * 1.15, 860)}`,
             pin: true,
             pinSpacing: false,
