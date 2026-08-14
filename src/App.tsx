@@ -107,8 +107,8 @@ function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClos
         <header className="project-viewer__header">
           <h2 id="project-viewer-title"><span>{project.number}</span> / {project.title}</h2>
           <div className="project-viewer__controls" aria-label={`${project.title} viewing options`}>
-            <button className={view === 'figma' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'figma'} onClick={() => setView('figma')}>Interactive prototype</button>
-            <button className={view === 'pdf' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'pdf'} onClick={() => setView('pdf')}>View case study</button>
+            <button className={view === 'figma' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'figma'} onClick={() => setView('figma')}>Prototype</button>
+            <button className={view === 'pdf' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'pdf'} onClick={() => setView('pdf')}>Download</button>
           </div>
           <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
         </header>
