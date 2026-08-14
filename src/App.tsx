@@ -521,8 +521,8 @@ function App() {
       media.add('(min-width: 1280px) and (prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector<HTMLElement>('.hero')
         const orb = hero?.querySelector<HTMLElement>('.hero-orb')
-        const portalVeil = hero?.querySelector<HTMLElement>('.hero__portal-veil')
-        if (!hero || !orb || !portalVeil) return undefined
+        const portalOverlay = document.querySelector<HTMLElement>('.hero-portal-overlay')
+        if (!hero || !orb || !portalOverlay) return undefined
 
         const portalStartViewport = 0.82
         const getPortalOrigin = () => ({
@@ -537,7 +537,7 @@ function App() {
           }
         }
         const getPortalRadius = () => Math.ceil(Math.hypot(window.innerWidth, window.innerHeight))
-        const getOrbScale = () => Math.min(3.2, Math.max(2.5, getPortalRadius() / Math.max(orb.offsetWidth, 1) * 0.36))
+        const getOrbScale = () => Math.min(2.9, Math.max(2.3, getPortalRadius() / Math.max(orb.offsetWidth, 1) * 0.32))
         const heroContent = [
           ...gsap.utils.toArray<HTMLElement>('.hero__eyebrow, .hero__title-line, .hero__aside, .hero__scroll'),
         ]
@@ -556,12 +556,12 @@ function App() {
         })
 
         portal
-          .set(portalVeil, { '--hero-portal-x': () => `${Math.round(getPortalOrigin().x)}px`, '--hero-portal-y': () => `${Math.round(getPortalOrigin().y)}px` }, 0)
-          .to(heroContent, { y: -44, autoAlpha: 0, duration: 0.34, ease: 'none', stagger: 0.015 }, 0)
-          .to(orb, { x: () => getOrbTarget().x, y: () => getOrbTarget().y, scale: 1.22, duration: 0.42, ease: 'none' }, 0)
-          .to(portalVeil, { '--hero-portal': () => `${Math.round(Math.min(window.innerWidth, window.innerHeight) * 0.18)}px`, duration: 0.16, ease: 'none' }, 0.42)
+          .set(portalOverlay, { autoAlpha: 1, '--hero-portal': '2px' }, 0)
+          .to(heroContent, { y: -32, autoAlpha: 0, duration: 0.36, ease: 'none', stagger: 0.015 }, 0)
+          .to(orb, { x: () => getOrbTarget().x, y: () => getOrbTarget().y, scale: 1.14, duration: 0.46, ease: 'none' }, 0)
           .to(orb, { scale: getOrbScale, autoAlpha: 0, duration: 0.58, ease: 'none' }, 0.42)
-          .to(portalVeil, { '--hero-portal': () => `${getPortalRadius()}px`, duration: 0.58, ease: 'none' }, 0.42)
+          .to(portalOverlay, { '--hero-portal': () => `${getPortalRadius()}px`, duration: 0.58, ease: 'none' }, 0.42)
+          .set(portalOverlay, { autoAlpha: 0 }, 1)
 
         return () => portal.kill()
       })
@@ -1046,10 +1046,10 @@ function App() {
           <a className="nav-contact" href="mailto:pelayotrivespozuelo@gmail.com">Let's talk <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a>
         </nav>
       </header>
+      <div className="hero-portal-overlay" aria-hidden="true" />
 
       <main id="top">
         <section className="hero" aria-labelledby="hero-title">
-          <div className="hero__portal-veil" aria-hidden="true" />
           <div className="hero__eyebrow"><span className="dot" /> Pelayo Trives | Product Engineer</div>
           <h1 id="hero-title"><span className="hero__title-line">Interfaces with</span><span className="hero__title-line"><em>something</em> to say.</span></h1>
           <p className="hero__aside">I turn complex ideas into clear, tactile digital experiences, with a soft spot for the strange bits.</p>
