@@ -155,36 +155,36 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 }
 
 /* Extension case studies: a compact three-up carousel with a scroll-led fourth card. */
-.extension-grid { --extension-gap: clamp(.8rem, 1.25vw, 1.25rem); position: relative; overflow: hidden; height: clamp(470px, 40vw, 560px); }
-.extension-track { display: flex; align-items: stretch; gap: var(--extension-gap); height: 100%; width: max-content; will-change: transform; }
-.extension-card { flex: 0 0 min(calc((100vw - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3), calc((1440px - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3)); display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; height: 100%; padding: clamp(.7rem, 1vw, 1rem); border: 1px solid var(--color-line); border-radius: 1.8rem; background: rgba(255, 252, 242, .78); color: var(--color-ink); text-decoration: none; overflow: hidden; will-change: transform; transition: border-color .3s var(--ease-out), background .3s var(--ease-out); }
-.extension-card:hover { border-color: var(--color-ink); background: var(--color-paper); }
+.extension-grid { --extension-gap: clamp(.8rem, 1.25vw, 1.25rem); position: relative; overflow: hidden; height: auto; }
+.extension-track { display: flex; align-items: stretch; gap: var(--extension-gap); height: auto; width: max-content; will-change: transform; }
+.extension-card { flex: 0 0 min(calc((100vw - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3), calc((1440px - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3)); display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; height: auto; padding: clamp(.7rem, 1vw, 1rem); border: 1px solid var(--color-line); border-radius: 1.8rem; background: rgba(255, 252, 242, .78); color: var(--color-ink); text-decoration: none; overflow: hidden; will-change: transform; transition: border-color .35s var(--ease-out), background .35s var(--ease-out), transform .35s var(--ease-out), box-shadow .35s var(--ease-out); }
+.extension-card:hover { border-color: var(--color-line); background: var(--color-paper); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37, 36, 34, .07); }
 .extension-card > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 0; border: 1px solid rgba(64, 61, 57, .25); border-right: 1px solid rgba(64, 61, 57, .25); border-radius: 1.1rem; outline: 1px solid rgba(255, 252, 242, .8); outline-offset: -4px; object-fit: contain; object-position: center; background: var(--color-ink); }
-.extension-card__body { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: clamp(1.3rem, 1.8vw, 2.2rem) clamp(.45rem, .8vw, .9rem) .25rem; }
+.extension-card__body { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: clamp(1rem, 1.35vw, 1.65rem) clamp(.45rem, .8vw, .9rem) .25rem; }
 .extension-card__meta { display: flex; align-items: center; color: var(--color-accent-deep); font: var(--text-micro); text-transform: uppercase; letter-spacing: .07em; }
-.extension-card__copy { margin-top: clamp(1.4rem, 2vw, 2.2rem); }
+.extension-card__copy { margin-top: clamp(1rem, 1.45vw, 1.6rem); }
 .extension-card h4 { max-width: none; margin: 0; font: clamp(1.8rem, 3vw, 3.7rem)/.88 var(--font-display); letter-spacing: -.06em; font-weight: 500; white-space: nowrap; }
 .extension-card p { max-width: 25rem; margin: 1rem 0 0; color: var(--color-muted); font-size: clamp(.82rem, .95vw, 1rem); line-height: 1.4; }
-.extension-card__badges { display: flex; gap: .45rem; margin-top: clamp(1.25rem, 2vw, 2rem); }
+.extension-card__badges { display: flex; gap: .45rem; margin-top: clamp(1rem, 1.45vw, 1.55rem); }
 .extension-badge { display: inline-flex; align-items: center; min-height: 1.8rem; padding: .4rem .72rem .42rem; border: 0; border-radius: var(--radius-pill); font: var(--text-micro); text-transform: uppercase; letter-spacing: .07em; }
 .extension-badge--design { background: #f6b3a2; color: var(--color-ink); }
 .extension-badge--utility { background: #c7d7cb; color: var(--color-ink); }
 .extension-badge--mgmt { background: #d8c4e8; color: var(--color-ink); }
 .extension-badge--creativity { background: #f3d77b; color: var(--color-ink); }
-.extension-card__footer { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: auto; padding-top: 1.15rem; border-top: 1px solid var(--color-line); }
+.extension-card__footer { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: clamp(1.5rem, 2vw, 2rem); padding-top: 1.15rem; border-top: 1px solid var(--color-line); }
 .extension-card__cta { display: inline-flex; align-items: center; gap: .7rem; font: 500 clamp(.9rem, 1vw, 1.08rem)/1.1 var(--font-body); letter-spacing: -.02em; }
 .extension-card__cta .icon-arrow { width: 1.25rem; height: 1.25rem; color: var(--color-accent); transition: transform .3s var(--ease-out); }
 .extension-card:hover .extension-card__cta .icon-arrow { transform: translate(3px, -3px); }
 
 @media (max-width: 700px) {
-  .extension-grid { height: clamp(500px, 126vw, 600px); overflow: hidden; }
-  .extension-track { display: flex; width: max-content; height: 100%; gap: 1rem; }
-  .extension-card { flex: 0 0 calc(100vw - 2 * var(--space-lg)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; width: calc(100vw - 2 * var(--space-lg)); height: 100%; min-height: 0; border-radius: 1.1rem; }
+  .extension-grid { height: auto; overflow: hidden; }
+  .extension-track { display: flex; width: max-content; height: auto; gap: 1rem; }
+  .extension-card { flex: 0 0 calc(100vw - 2 * var(--space-lg)); grid-template-columns: 1fr; grid-template-rows: auto 1fr; width: calc(100vw - 2 * var(--space-lg)); height: auto; min-height: 0; border-radius: 1.1rem; }
   .extension-card > img { height: auto; border-radius: .85rem; }
-  .extension-card__body { padding: .9rem .35rem .35rem; }
-  .extension-card__copy { margin: 1.4rem 0 0; }
+  .extension-card__body { padding: .8rem .35rem .35rem; }
+  .extension-card__copy { margin: 1rem 0 0; }
   .extension-card h4 { max-width: none; font-size: clamp(2rem, 9vw, 3.4rem); white-space: normal; }
   .extension-card p { max-width: 100%; margin-top: .8rem; font-size: .8rem; }
-  .extension-card__badges { margin-top: 1.35rem; margin-bottom: .9rem; }
+  .extension-card__badges { margin-top: 1.1rem; margin-bottom: .7rem; }
   .extension-card__footer { padding-top: 1.2rem; }
 }

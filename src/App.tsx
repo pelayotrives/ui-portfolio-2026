@@ -489,7 +489,7 @@ function App() {
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=104',
+            start: 'top top+=128',
             end: () => `+=${Math.max(window.innerHeight * 0.9, 620)}`,
             pin: true,
             scrub: 0.9,
@@ -517,7 +517,7 @@ function App() {
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=84',
+            start: 'top top+=102',
             end: () => `+=${Math.max(window.innerHeight * 1.05, 560) * (cards.length - 1)}`,
             pin: true,
             scrub: 0.9,
