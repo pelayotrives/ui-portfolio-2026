@@ -194,7 +194,7 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   position: relative;
   width: 100%;
   min-width: 0;
-  margin-top: clamp(3.5rem, 6vw, 6rem);
+  margin-top: clamp(3.5rem, 6vw, 3.5rem);
   padding: 1.15rem 0;
   overflow: hidden;
   border-top: 1px solid var(--color-line);
@@ -230,7 +230,7 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   opacity: .58;
 }
 @media (max-width: 700px) {
-  .client-marquee { margin-top: 3.5rem; padding-block: 1rem; }
+  .client-marquee { margin-top: 3rem; padding-block: 1rem; }
   .client-marquee__group { gap: 2rem; padding-right: 2rem; }
   .client-marquee__item { flex-basis: 6.8rem; width: 6.8rem; height: 2.5rem; }
 }
