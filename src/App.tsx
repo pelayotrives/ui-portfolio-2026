@@ -544,7 +544,7 @@ function App() {
         const portal = gsap.timeline({
           scrollTrigger: {
             trigger: hero,
-            start: 'top top',
+            start: 'top -8%',
             end: () => `+=${Math.max(window.innerHeight * 1.15, 860)}`,
             pin: true,
             pinSpacing: false,
