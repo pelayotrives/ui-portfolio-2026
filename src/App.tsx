@@ -95,15 +95,11 @@ function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
 }
 
 function ClientMarquee() {
-  const [loadedCount, setLoadedCount] = useState(0)
-  const expectedAssets = clientLogos.length
-  const markLoaded = () => setLoadedCount((count) => Math.min(count + 1, expectedAssets))
-
   return (
     <div className="client-marquee-region" aria-label="Clients I have worked with">
-      <Skeleton name="client-marquee" loading={loadedCount < expectedAssets} transition={220} className="client-marquee" fallback={<div className="client-marquee__fallback" aria-hidden="true">{clientLogos.map((logo) => <img className="boneyard-preload-logo" src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" key={logo} onLoad={markLoaded} onError={markLoaded} />)}</div>}>
-        <div className="client-marquee__track" aria-hidden="true">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" onLoad={markLoaded} onError={markLoaded} /></span>)}</div>)}</div>
-      </Skeleton>
+      <div className="client-marquee" aria-hidden="true">
+        <div className="client-marquee__track">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div>
+      </div>
     </div>
   )
 }
