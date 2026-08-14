@@ -46,6 +46,17 @@ const extensions: Extension[] = [
   { title: 'Make Me Useful', note: 'A Pomodoro-style page blocker for staying with the task at hand.', image: 'projects/make_me_useful_image.png', href: 'https://chromewebstore.google.com/detail/make-me-useful/pacfhmmocmgdknbnabhgipcfkjjehmla', categories: ['Utility', 'MGMT'] },
 ]
 
+const clientLogos = [
+  'logo_actiu.svg', 'logo_aenor.svg', 'logo_alhambra.svg', 'logo_amazon.svg', 'logo_bbva.svg',
+  'logo_caixabank.svg', 'logo_cegid.svg', 'logo_cepsa.svg', 'logo_cle_de_peau.svg', 'logo_cloud_champion.svg',
+  'logo_dacia.svg', 'logo_ecovidrio.svg', 'logo_elizabeth_arden.svg', 'logo_endesa.svg', 'logo_estrella_galicia.svg',
+  'logo_filorga.svg', 'logo_genaq.svg', 'logo_gsk.svg', 'logo_iberdrola.svg', 'logo_ikea.svg',
+  'logo_isdin.svg', 'logo_issey_miyake.svg', 'logo_kapturall.svg', 'logo_laliga.svg', 'logo_mahou.svg',
+  'logo_microsoft.svg', 'logo_narciso_rodriguez.svg', 'logo_nars.svg', 'logo_naturgy.svg', 'logo_paradores.svg',
+  'logo_peugeot.svg', 'logo_polestar.svg', 'logo_sandvik.svg', 'logo_santander.svg', 'logo_shiseido.svg',
+  'logo_telefonica.svg', 'logo_ule.svg', 'logo_universidad_europea.svg', 'logo_vicktor_and_rolf.svg',
+] as const
+
 const projectAreas: Record<string, string> = {
   '01': 'AI development & automation',
   '02': 'Business consulting',
@@ -472,6 +483,19 @@ function App() {
           y: 0, opacity: 1, filter: 'blur(0px)', duration: 0.85, delay: index * 0.05, ease: 'power3.out',
           scrollTrigger: { trigger: card, start: 'top 58%', end: 'bottom 42%', toggleActions: 'play reverse play reverse' },
         })
+      })
+      media.add('(prefers-reduced-motion: no-preference)', () => {
+        const track = document.querySelector<HTMLElement>('.client-marquee__track')
+        if (!track) return undefined
+
+        const loop = gsap.to(track, {
+          xPercent: -50,
+          duration: 68,
+          ease: 'none',
+          repeat: -1,
+        })
+
+        return () => loop.kill()
       })
       media.add('(min-width: 701px)', () => {
         const stage = document.querySelector<HTMLElement>('.extension-grid')
@@ -980,7 +1004,7 @@ function App() {
         <section className="about-section" id="about" aria-labelledby="about-title" data-scroll-divider="top">
           <div className="about-panel__inner">
             <div className="section-index">02</div>
-            <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
+            <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><div className="client-marquee" aria-label="Clients I have worked with"><div className="client-marquee__track" aria-hidden="true">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div></div><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
           </div>
         </section>
 
