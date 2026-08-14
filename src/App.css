@@ -256,6 +256,7 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 }
 
 /* Extension cards stay grounded on hover; depth comes from shadow alone. */
-.extension-card { transition: border-color .35s var(--ease-out), background .35s var(--ease-out), color .35s var(--ease-out); }
+.extension-card { transition: border-color .48s var(--ease-out), background .48s var(--ease-out), color .48s var(--ease-out); }
 .extension-card:hover { border-color: var(--color-accent-deep); background: var(--color-paper); transform: none; box-shadow: none; }
+.extension-card h4 { transition: color .48s var(--ease-out); }
 .extension-card:hover h4 { color: var(--color-accent-deep); }
