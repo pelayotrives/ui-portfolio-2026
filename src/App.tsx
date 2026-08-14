@@ -7,9 +7,17 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { ArrowUp, ArrowUpRight, Asterisk } from 'lucide-react'
 import Lenis from 'lenis'
+import { Skeleton, configureBoneyard } from 'boneyard-js/react'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
+configureBoneyard({
+  color: 'rgba(204, 197, 185, .46)',
+  darkColor: 'rgba(255, 252, 242, .12)',
+  animate: 'shimmer',
+  shimmerColor: 'rgba(255, 252, 242, .72)',
+  speed: '2.4s',
+})
 
 const loadThree = () => import('./three-runtime').then(({ THREE }) => THREE)
 
@@ -33,18 +41,18 @@ type Extension = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'projects/pdf/octalea.pdf', image: 'projects/octalea_image.png' },
-  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'projects/pdf/dealium.pdf', image: 'projects/dealium_image.png' },
-  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'projects/pdf/accra.pdf', image: 'projects/accra_image.png' },
-  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'projects/pdf/suenos_de_colores.pdf', image: 'projects/suenos_de_colores_image.png' },
-  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'projects/pdf/floddets.pdf', image: 'projects/floddets_image.png' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'projects/pdf/octalea.pdf', image: 'projects/octalea_image.webp' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'projects/pdf/dealium.pdf', image: 'projects/dealium_image.webp' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'projects/pdf/accra.pdf', image: 'projects/accra_image.webp' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'projects/pdf/suenos_de_colores.pdf', image: 'projects/suenos_de_colores_image.webp' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'projects/pdf/floddets.pdf', image: 'projects/floddets_image.webp' },
 ]
 
 const extensions: Extension[] = [
-  { title: 'Extensio Patronus', note: 'A control panel for keeping every browser extension in one tidy place.', image: 'projects/extensio_patronus_image.png', href: 'https://chromewebstore.google.com/detail/extensio-patronus/ocmdlafnolpcdjjlbiabhiljojkjoolm', categories: ['MGMT', 'Utility'] },
-  { title: 'Crop & Convert', note: 'Bulk image exports with preset and custom crops for social formats.', image: 'projects/crop_and_convert_image.png', href: 'https://chromewebstore.google.com/detail/crop-convert/ikjkgiblokpgjfmkmogedlfdhkigicpb', categories: ['Design', 'Utility'] },
-  { title: 'Buttonizer', note: 'A browser library for collecting and reusing custom buttons from the web.', image: 'projects/buttonizer_image.png', href: 'https://chromewebstore.google.com/detail/buttonizer/cghjhagffajljkdapabcnbdnadllmkcp', categories: ['Creativity', 'Design'] },
-  { title: 'Make Me Useful', note: 'A Pomodoro-style page blocker for staying with the task at hand.', image: 'projects/make_me_useful_image.png', href: 'https://chromewebstore.google.com/detail/make-me-useful/pacfhmmocmgdknbnabhgipcfkjjehmla', categories: ['Utility', 'MGMT'] },
+  { title: 'Extensio Patronus', note: 'A control panel for keeping every browser extension in one tidy place.', image: 'projects/extensio_patronus_image.webp', href: 'https://chromewebstore.google.com/detail/extensio-patronus/ocmdlafnolpcdjjlbiabhiljojkjoolm', categories: ['MGMT', 'Utility'] },
+  { title: 'Crop & Convert', note: 'Bulk image exports with preset and custom crops for social formats.', image: 'projects/crop_and_convert_image.webp', href: 'https://chromewebstore.google.com/detail/crop-convert/ikjkgiblokpgjfmkmogedlfdhkigicpb', categories: ['Design', 'Utility'] },
+  { title: 'Buttonizer', note: 'A browser library for collecting and reusing custom buttons from the web.', image: 'projects/buttonizer_image.webp', href: 'https://chromewebstore.google.com/detail/buttonizer/cghjhagffajljkdapabcnbdnadllmkcp', categories: ['Creativity', 'Design'] },
+  { title: 'Make Me Useful', note: 'A Pomodoro-style page blocker for staying with the task at hand.', image: 'projects/make_me_useful_image.webp', href: 'https://chromewebstore.google.com/detail/make-me-useful/pacfhmmocmgdknbnabhgipcfkjjehmla', categories: ['Utility', 'MGMT'] },
 ]
 
 const clientLogos = [
@@ -74,10 +82,37 @@ const contactLinks = [
 ]
 
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
+  const [loaded, setLoaded] = useState(false)
+  const imageSrc = `${import.meta.env.BASE_URL}${project.image}`
+
   return (
-    <div className={`artwork ${project.className}`} aria-hidden="true">
-      <img src={`${import.meta.env.BASE_URL}${project.image}`} alt="" loading="lazy" decoding="async" />
+    <Skeleton name={`project-artwork-${project.number}`} loading={!loaded} transition={240} className="artwork-skeleton" fallback={<div className="artwork-skeleton__fallback" aria-hidden="true"><img className="boneyard-preload-image" src={imageSrc} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} /></div>}>
+      <div className={`artwork ${project.className}`} aria-hidden="true">
+        <img src={imageSrc} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
+      </div>
+    </Skeleton>
+  )
+}
+
+function ClientMarquee() {
+  return (
+    <div className="client-marquee-region" aria-label="Clients I have worked with">
+      <div className="client-marquee" aria-hidden="true">
+        <div className="client-marquee__track">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div>
+      </div>
     </div>
+  )
+}
+
+function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view: 'figma' | 'pdf' }>) {
+  const [loaded, setLoaded] = useState(false)
+  const source = view === 'figma' ? project.figmaUrl : `${import.meta.env.BASE_URL}${project.pdf}`
+  const title = view === 'figma' ? `${project.title} interactive prototype` : `${project.title} case study PDF`
+
+  return (
+    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true"><iframe className="project-viewer__preload-frame" src={source} title={title} onLoad={() => setLoaded(true)} /></div>}>
+      {view === 'figma' ? <iframe src={source} title={title} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} /> : <iframe className="project-viewer__pdf" src={source} title={title} loading="lazy" onLoad={() => setLoaded(true)} />}
+    </Skeleton>
   )
 }
 
@@ -112,9 +147,7 @@ function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClos
           </div>
           <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
         </header>
-        <div className="project-viewer__frame">
-          {view === 'figma' ? <iframe src={project.figmaUrl} title={`${project.title} interactive prototype`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <iframe className="project-viewer__pdf" src={`${import.meta.env.BASE_URL}${project.pdf}`} title={`${project.title} case study PDF`} loading="lazy" />}
-        </div>
+        <ProjectViewerFrame key={`${project.number}-${view}`} project={project} view={view} />
       </div>
     </div>
   )
@@ -514,13 +547,14 @@ function App() {
           const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
           return -(firstCard.getBoundingClientRect().width + gap)
         }
+        const getPinOffset = () => Math.max(24, Math.round((window.innerHeight - stage.offsetHeight) / 2))
 
         const tween = gsap.to(track, {
           x: getCardShift,
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=128',
+            start: () => `top top+=${getPinOffset()}`,
             end: () => `+=${Math.max(window.innerHeight * 0.9, 620)}`,
             pin: true,
             scrub: 0.9,
@@ -542,13 +576,14 @@ function App() {
           const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
           return firstCard.getBoundingClientRect().width + gap
         }
+        const getPinOffset = () => Math.max(24, Math.round((window.innerHeight - stage.offsetHeight) / 2))
 
         const tween = gsap.to(track, {
           x: () => -getCardShift() * (cards.length - 1),
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=102',
+            start: () => `top top+=${getPinOffset()}`,
             end: () => `+=${Math.max(window.innerHeight * 1.05, 560) * (cards.length - 1)}`,
             pin: true,
             scrub: 0.9,
@@ -585,7 +620,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -633,7 +668,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${innerPanel.scrollHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -683,7 +718,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -731,7 +766,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -992,7 +1027,7 @@ function App() {
           </div>
           <div className="extension-work" data-scroll-divider="top">
             <div className="extension-work__heading">
-              <div><span className="section-index">browser tools</span><h3>Small utilities,<br />built to help.</h3></div>
+              <div><span className="section-index">Chrome Browser Tools</span><h3>Small utilities,<br />built to help.</h3></div>
               <p>A growing collection of small tools for the everyday frictions worth smoothing out.</p>
             </div>
             <div className="extension-grid">
@@ -1011,7 +1046,7 @@ function App() {
         <section className="about-section" id="about" aria-labelledby="about-title" data-scroll-divider="top">
           <div className="about-panel__inner">
             <div className="section-index">02</div>
-            <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><div className="client-marquee" aria-label="Clients I have worked with"><div className="client-marquee__track" aria-hidden="true">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div></div><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
+            <div className="about-copy"><h2 id="about-title">Hi, I’m <span className="about-title__name">Pelayo</span> Trives<span>.</span></h2><ClientMarquee /><p className="about-lede">A Product Engineer interested in the space between a good idea and the moment it clicks.</p><p>I work in Figma from the first slightly-too-rough sketch to the final tiny transition. I like systems that leave room for personality, and interfaces that reward a second look.</p><div className="timeline" aria-label="Education and experience timeline"><div className="timeline__track" /><div className="timeline__progress" /><div className="timeline__item"><span className="timeline__date">2023—Now</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Culpass</h3><p>Full Stack Developer &amp; Technical Project Manager.</p></div></div><div className="timeline__item"><span className="timeline__date">2024—2026</span><span className="timeline__dot" aria-hidden="true" /><div><h3>VIU · Universidad Internacional de Valencia</h3><p>Master’s degree in Artificial Intelligence, Machine Learning and Computational Optimization.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2025</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Luce Innovative Technologies</h3><p>Full Stack Developer.</p></div></div><div className="timeline__item"><span className="timeline__date">2023—2024</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Kapturall</h3><p>Front-End Developer &amp; UX/UI Design Lead.</p></div></div><div className="timeline__item"><span className="timeline__date">2023</span><span className="timeline__dot" aria-hidden="true" /><div><h3>Vocento.Medios</h3><p>Front-End Developer for editorial and online publishing experiences.</p></div></div><div className="timeline__item"><span className="timeline__date">2018—2022</span><span className="timeline__dot" aria-hidden="true" /><div><h3>UOC · Universitat Oberta de Catalunya</h3><p>Bachelor in Multimedia.</p></div></div></div><a className="text-link" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">More about me <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></div>
           </div>
         </section>
 
