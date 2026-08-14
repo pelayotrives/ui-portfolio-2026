@@ -57,9 +57,11 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .project-viewer__close { appearance: none; border: 0; background: transparent; color: var(--color-ink); padding: .4rem 0; font: var(--text-micro); text-transform: uppercase; letter-spacing: .08em; cursor: none; }
 .project-viewer__close span { display: inline-block; margin-left: .35rem; color: var(--color-accent-deep); font-size: 1.25rem; line-height: .7; transition: transform var(--dur-fast) var(--ease-out); }
 .project-viewer__close:hover span { transform: rotate(90deg); }
-.project-viewer__frame { flex: 1; min-height: 0; background: #f7f5ed; }
-.project-viewer__frame iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; }
-.project-viewer__frame iframe.project-viewer__pdf { background: var(--color-ink); }
+.project-viewer__media-shell { display: flex; flex: 1; position: relative; min-height: 0; background: #f7f5ed; }
+.project-viewer__media-shell > [data-boneyard-content] { display: flex; flex: 1; min-height: 0; }
+.project-viewer__media-shell iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; }
+.project-viewer__media-shell iframe.project-viewer__pdf { background: var(--color-ink); }
+.project-viewer__media-fallback { width: 100%; height: 100%; min-height: 420px; background: linear-gradient(120deg, rgba(204, 197, 185, .18), rgba(255, 252, 242, .85), rgba(204, 197, 185, .18)); }
 .project-viewer__footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .8rem 1.25rem; border-top: var(--rule-hairline); color: var(--color-muted); font: var(--text-micro); text-transform: uppercase; letter-spacing: .06em; }
 .project-viewer__footer a { color: var(--color-ink); text-decoration: none; }
 .project-viewer__footer a:hover { color: var(--color-accent-deep); }
@@ -71,7 +73,7 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
   .project-viewer__header { flex-wrap: wrap; padding: 1rem 1.1rem .8rem; }
   .project-viewer__controls { order: 3; flex-basis: 100%; justify-content: center; margin-left: 0; }
   .project-viewer__tab { flex: 1 1 0; }
-  .project-viewer__frame iframe { min-height: 0; }
+  .project-viewer__media-shell iframe, .project-viewer__media-fallback { min-height: 0; }
   .project-viewer__footer { padding: .75rem 1.1rem; font-size: .58rem; }
 }
 
@@ -91,6 +93,9 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 .project-card h3 { line-height: 1; margin-bottom: 12px; }
 .artwork { aspect-ratio: 1 / 1; height: auto; max-height: none; }
 .artwork img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.artwork-skeleton { display: block; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; }
+.artwork-skeleton > [data-boneyard-content] { width: 100%; height: 100%; }
+.artwork-skeleton__fallback { width: 100%; height: 100%; background: linear-gradient(115deg, rgba(204, 197, 185, .2), rgba(235, 94, 40, .12), rgba(204, 197, 185, .2)); }
 .project-viewer__header h2 { margin: 0; font: clamp(1.25rem, 3vw, 2rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
 .project-viewer__close { display: inline-flex; align-items: center; gap: .45rem; }
 .project-viewer__close span { margin: 0; font-size: 1.65rem; line-height: .8; }
@@ -183,7 +188,7 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 .extension-card__footer { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: clamp(1.5rem, 2vw, 2rem); padding-top: 1.15rem; border-top: 1px solid var(--color-line); }
 .extension-card__cta { display: inline-flex; align-items: center; gap: .7rem; font: 500 clamp(.9rem, 1vw, 1.08rem)/1.1 var(--font-body); letter-spacing: -.02em; }
 .extension-card__cta .icon-arrow { width: 1.25rem; height: 1.25rem; color: var(--color-accent); transition: transform .3s var(--ease-out); }
-.extension-card:hover .extension-card__cta .icon-arrow { transform: translate(3px, -3px); }
+.extension-card:hover .extension-card__cta .icon-arrow { transform: none; }
 
 @media (max-width: 700px) {
   .extension-grid { height: auto; overflow: hidden; }
@@ -199,6 +204,7 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 }
 
 /* Client logos: a quiet, continuous strip inside the constrained about column. */
+.client-marquee-region { width: 100%; min-width: 0; }
 .client-marquee {
   position: relative;
   width: 100%;
@@ -211,6 +217,8 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
 }
+.client-marquee > [data-boneyard-content] { width: 100%; min-height: 4.7rem; }
+.client-marquee__fallback { width: 100%; height: 4.7rem; background: linear-gradient(110deg, rgba(204, 197, 185, .14), rgba(235, 94, 40, .1), rgba(204, 197, 185, .14)); }
 .client-marquee__track {
   display: flex;
   width: max-content;
@@ -225,9 +233,9 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 }
 .client-marquee__item {
   display: grid;
-  flex: 0 0 clamp(6.5rem, 10vw, 10rem);
-  width: clamp(6.5rem, 10vw, 10rem);
-  height: clamp(2.4rem, 3.5vw, 3.35rem);
+  flex: 0 0 clamp(5.8rem, 8.8vw, 8.75rem);
+  width: clamp(5.8rem, 8.8vw, 8.75rem);
+  height: clamp(2.2rem, 3.1vw, 2.95rem);
   place-items: center;
 }
 .client-marquee__item img {
@@ -238,8 +246,14 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   filter: grayscale(1) brightness(0);
   opacity: .58;
 }
+.client-marquee__item > [data-boneyard-content] { display: grid; width: 100%; height: 100%; place-items: center; }
+.client-marquee__logo-fallback { display: block; width: 68%; height: 34%; border-radius: 999px; background: var(--color-line); }
 @media (max-width: 700px) {
   .client-marquee { margin-top: 3rem; padding-block: 1rem; }
   .client-marquee__group { gap: 2rem; padding-right: 2rem; }
-  .client-marquee__item { flex-basis: 6.8rem; width: 6.8rem; height: 2.5rem; }
+  .client-marquee__item { flex-basis: 6.1rem; width: 6.1rem; height: 2.25rem; }
 }
+
+/* Extension cards stay grounded on hover; depth comes from shadow alone. */
+.extension-card { transition: border-color .35s var(--ease-out), background .35s var(--ease-out), box-shadow .35s var(--ease-out); }
+.extension-card:hover { border-color: var(--color-line); background: var(--color-paper); transform: none; box-shadow: 0 10px 24px rgba(37, 36, 34, .08); }
