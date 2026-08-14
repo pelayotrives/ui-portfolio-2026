@@ -50,8 +50,9 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .project-viewer__header h2 { margin: 0; font: clamp(1.6rem, 3vw, 2.5rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
 .project-viewer__controls { display: flex; align-items: center; gap: .2rem; margin-left: auto; padding: .2rem; border: 1px solid var(--color-line); border-radius: var(--radius-pill); }
 .project-viewer__tab { appearance: none; border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--color-muted); padding: .5rem .7rem; font: var(--text-micro); letter-spacing: .03em; cursor: none; transition: background-color .25s var(--ease-out), color .25s var(--ease-out); }
-.project-viewer__tab:hover, .project-viewer__tab:focus-visible { color: var(--color-ink); }
+.project-viewer__tab:not(.project-viewer__tab--active):hover, .project-viewer__tab:not(.project-viewer__tab--active):focus-visible { color: var(--color-ink); }
 .project-viewer__tab--active { background: var(--color-ink); color: var(--color-paper); }
+.project-viewer__tab--active:hover, .project-viewer__tab--active:focus-visible { background: var(--color-ink); color: var(--color-paper); }
 .project-viewer__tab:focus-visible, .project-viewer__close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 .project-viewer__close { appearance: none; border: 0; background: transparent; color: var(--color-ink); padding: .4rem 0; font: var(--text-micro); text-transform: uppercase; letter-spacing: .08em; cursor: none; }
 .project-viewer__close span { display: inline-block; margin-left: .35rem; color: var(--color-accent-deep); font-size: 1.25rem; line-height: .7; transition: transform var(--dur-fast) var(--ease-out); }
