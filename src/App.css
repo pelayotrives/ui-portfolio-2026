@@ -61,7 +61,8 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .project-viewer__media-shell > [data-boneyard-content] { display: flex; flex: 1; min-height: 0; }
 .project-viewer__media-shell iframe { display: block; width: 100%; height: 100%; min-height: 420px; border: 0; }
 .project-viewer__media-shell iframe.project-viewer__pdf { background: var(--color-ink); }
-.project-viewer__media-fallback { width: 100%; height: 100%; min-height: 420px; background: linear-gradient(120deg, rgba(204, 197, 185, .18), rgba(255, 252, 242, .85), rgba(204, 197, 185, .18)); }
+.project-viewer__media-fallback { position: relative; width: 100%; height: 100%; min-height: 420px; background: linear-gradient(120deg, rgba(204, 197, 185, .18), rgba(255, 252, 242, .85), rgba(204, 197, 185, .18)); }
+.project-viewer__preload-frame { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; border: 0; }
 .project-viewer__footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .8rem 1.25rem; border-top: var(--rule-hairline); color: var(--color-muted); font: var(--text-micro); text-transform: uppercase; letter-spacing: .06em; }
 .project-viewer__footer a { color: var(--color-ink); text-decoration: none; }
 .project-viewer__footer a:hover { color: var(--color-accent-deep); }
@@ -95,7 +96,8 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 .artwork img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; }
 .artwork-skeleton { display: block; width: 100%; aspect-ratio: 1 / 1; overflow: hidden; }
 .artwork-skeleton > [data-boneyard-content] { width: 100%; height: 100%; }
-.artwork-skeleton__fallback { width: 100%; height: 100%; background: linear-gradient(115deg, rgba(204, 197, 185, .2), rgba(235, 94, 40, .12), rgba(204, 197, 185, .2)); }
+.artwork-skeleton__fallback { position: relative; width: 100%; height: 100%; background: linear-gradient(115deg, rgba(204, 197, 185, .2), rgba(235, 94, 40, .12), rgba(204, 197, 185, .2)); }
+.boneyard-preload-image { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; object-fit: cover; }
 .project-viewer__header h2 { margin: 0; font: clamp(1.25rem, 3vw, 2rem)/.95 var(--font-display); letter-spacing: -.05em; font-weight: 500; }
 .project-viewer__close { display: inline-flex; align-items: center; gap: .45rem; }
 .project-viewer__close span { margin: 0; font-size: 1.65rem; line-height: .8; }
@@ -218,7 +220,8 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
   mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
 }
 .client-marquee > [data-boneyard-content] { width: 100%; min-height: 4.7rem; }
-.client-marquee__fallback { width: 100%; height: 4.7rem; background: linear-gradient(110deg, rgba(204, 197, 185, .14), rgba(235, 94, 40, .1), rgba(204, 197, 185, .14)); }
+.client-marquee__fallback { position: relative; width: 100%; height: 4.7rem; background: linear-gradient(110deg, rgba(204, 197, 185, .14), rgba(235, 94, 40, .1), rgba(204, 197, 185, .14)); }
+.boneyard-preload-logo { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .client-marquee__track {
   display: flex;
   width: max-content;

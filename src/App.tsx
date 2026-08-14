@@ -83,11 +83,12 @@ const contactLinks = [
 
 function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
   const [loaded, setLoaded] = useState(false)
+  const imageSrc = `${import.meta.env.BASE_URL}${project.image}`
 
   return (
-    <Skeleton name={`project-artwork-${project.number}`} loading={!loaded} transition={240} className="artwork-skeleton" fallback={<div className="artwork-skeleton__fallback" aria-hidden="true" />}>
+    <Skeleton name={`project-artwork-${project.number}`} loading={!loaded} transition={240} className="artwork-skeleton" fallback={<div className="artwork-skeleton__fallback" aria-hidden="true"><img className="boneyard-preload-image" src={imageSrc} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} /></div>}>
       <div className={`artwork ${project.className}`} aria-hidden="true">
-        <img src={`${import.meta.env.BASE_URL}${project.image}`} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
+        <img src={imageSrc} alt="" loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setLoaded(true)} />
       </div>
     </Skeleton>
   )
@@ -95,12 +96,12 @@ function ProjectArtwork({ project }: Readonly<{ project: Project }>) {
 
 function ClientMarquee() {
   const [loadedCount, setLoadedCount] = useState(0)
-  const expectedAssets = clientLogos.length * 2
+  const expectedAssets = clientLogos.length
   const markLoaded = () => setLoadedCount((count) => Math.min(count + 1, expectedAssets))
 
   return (
     <div className="client-marquee-region" aria-label="Clients I have worked with">
-      <Skeleton name="client-marquee" loading={loadedCount < expectedAssets} transition={220} className="client-marquee" fallback={<div className="client-marquee__fallback" aria-hidden="true" />}>
+      <Skeleton name="client-marquee" loading={loadedCount < expectedAssets} transition={220} className="client-marquee" fallback={<div className="client-marquee__fallback" aria-hidden="true">{clientLogos.map((logo) => <img className="boneyard-preload-logo" src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" key={logo} onLoad={markLoaded} onError={markLoaded} />)}</div>}>
         <div className="client-marquee__track" aria-hidden="true">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" onLoad={markLoaded} onError={markLoaded} /></span>)}</div>)}</div>
       </Skeleton>
     </div>
@@ -109,10 +110,12 @@ function ClientMarquee() {
 
 function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view: 'figma' | 'pdf' }>) {
   const [loaded, setLoaded] = useState(false)
+  const source = view === 'figma' ? project.figmaUrl : `${import.meta.env.BASE_URL}${project.pdf}`
+  const title = view === 'figma' ? `${project.title} interactive prototype` : `${project.title} case study PDF`
 
   return (
-    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true" />}>
-      {view === 'figma' ? <iframe src={project.figmaUrl} title={`${project.title} interactive prototype`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} /> : <iframe className="project-viewer__pdf" src={`${import.meta.env.BASE_URL}${project.pdf}`} title={`${project.title} case study PDF`} loading="lazy" onLoad={() => setLoaded(true)} />}
+    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true"><iframe className="project-viewer__preload-frame" src={source} title={title} onLoad={() => setLoaded(true)} /></div>}>
+      {view === 'figma' ? <iframe src={source} title={title} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} /> : <iframe className="project-viewer__pdf" src={source} title={title} loading="lazy" onLoad={() => setLoaded(true)} />}
     </Skeleton>
   )
 }
