@@ -547,13 +547,14 @@ function App() {
           const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
           return -(firstCard.getBoundingClientRect().width + gap)
         }
+        const getPinOffset = () => Math.max(24, Math.round((window.innerHeight - stage.offsetHeight) / 2))
 
         const tween = gsap.to(track, {
           x: getCardShift,
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=128',
+            start: () => `top top+=${getPinOffset()}`,
             end: () => `+=${Math.max(window.innerHeight * 0.9, 620)}`,
             pin: true,
             scrub: 0.9,
@@ -575,13 +576,14 @@ function App() {
           const gap = Number.parseFloat(getComputedStyle(track).gap) || 0
           return firstCard.getBoundingClientRect().width + gap
         }
+        const getPinOffset = () => Math.max(24, Math.round((window.innerHeight - stage.offsetHeight) / 2))
 
         const tween = gsap.to(track, {
           x: () => -getCardShift() * (cards.length - 1),
           ease: 'none',
           scrollTrigger: {
             trigger: stage,
-            start: 'top top+=102',
+            start: () => `top top+=${getPinOffset()}`,
             end: () => `+=${Math.max(window.innerHeight * 1.05, 560) * (cards.length - 1)}`,
             pin: true,
             scrub: 0.9,
@@ -618,7 +620,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -666,7 +668,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${innerPanel.scrollHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -716,7 +718,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,
@@ -764,7 +766,7 @@ function App() {
         const timeline = gsap.timeline({
           scrollTrigger: {
             trigger: panel,
-            start: 'bottom bottom',
+            start: 'top top',
             end: () => metrics.difference > 0 ? `+=${metrics.innerHeight}` : 'bottom top',
             pin: true,
             pinSpacing: false,

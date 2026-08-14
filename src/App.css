@@ -173,8 +173,9 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 /* Extension case studies: a compact three-up carousel with a scroll-led fourth card. */
 .extension-grid { --extension-gap: clamp(.8rem, 1.25vw, 1.25rem); position: relative; overflow: hidden; height: auto; }
 .extension-track { display: flex; align-items: stretch; gap: var(--extension-gap); height: auto; width: max-content; will-change: transform; }
-.extension-card { flex: 0 0 min(calc((100vw - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3), calc((1440px - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3)); display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; height: auto; padding: clamp(.7rem, 1vw, 1rem); border: 1px solid var(--color-line); border-radius: 1.8rem; background: rgba(255, 252, 242, .78); color: var(--color-ink); text-decoration: none; overflow: hidden; will-change: transform; transition: border-color .35s var(--ease-out), background .35s var(--ease-out), transform .35s var(--ease-out), box-shadow .35s var(--ease-out); }
-.extension-card:hover { border-color: var(--color-line); background: var(--color-paper); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37, 36, 34, .07); }
+.extension-card { flex: 0 0 min(calc((100vw - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3), calc((1440px - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3)); display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; height: auto; padding: clamp(.7rem, 1vw, 1rem); border: 1px solid var(--color-line); border-radius: 1.8rem; background: rgba(255, 252, 242, .78); color: var(--color-ink); overflow: hidden; will-change: transform; transition: border-color .35s var(--ease-out), background .35s var(--ease-out), color .35s var(--ease-out); }
+.extension-card:hover { border-color: var(--color-accent-deep); background: var(--color-paper); }
+.extension-card:hover h4 { color: var(--color-accent-deep); }
 .extension-card > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 0; border: 1px solid rgba(64, 61, 57, .25); border-right: 1px solid rgba(64, 61, 57, .25); border-radius: 1.1rem; outline: 1px solid rgba(255, 252, 242, .8); outline-offset: -4px; object-fit: contain; object-position: center; background: var(--color-ink); }
 .extension-card__body { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: clamp(1rem, 1.35vw, 1.65rem) clamp(.45rem, .8vw, .9rem) .25rem; }
 .extension-card__meta { display: flex; align-items: center; color: var(--color-accent-deep); font: var(--text-micro); text-transform: uppercase; letter-spacing: .07em; }
@@ -255,5 +256,6 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 }
 
 /* Extension cards stay grounded on hover; depth comes from shadow alone. */
-.extension-card { transition: border-color .35s var(--ease-out), background .35s var(--ease-out), box-shadow .35s var(--ease-out); }
-.extension-card:hover { border-color: var(--color-line); background: var(--color-paper); transform: none; box-shadow: 0 10px 24px rgba(37, 36, 34, .08); }
+.extension-card { transition: border-color .35s var(--ease-out), background .35s var(--ease-out), color .35s var(--ease-out); }
+.extension-card:hover { border-color: var(--color-accent-deep); background: var(--color-paper); transform: none; box-shadow: none; }
+.extension-card:hover h4 { color: var(--color-accent-deep); }
