@@ -20,6 +20,7 @@ type Project = {
   note: string
   className: string
   figmaUrl: string
+  pdf: string
   image: string
 }
 
@@ -32,11 +33,11 @@ type Extension = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', image: 'projects/octalea_image.png' },
-  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', image: 'projects/dealium_image.png' },
-  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', image: 'projects/accra_image.png' },
-  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', image: 'projects/suenos_de_colores_image.png' },
-  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', image: 'projects/floddets_image.png' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'projects/pdf/octalea.pdf', image: 'projects/octalea_image.png' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'projects/pdf/dealium.pdf', image: 'projects/dealium_image.png' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'projects/pdf/accra.pdf', image: 'projects/accra_image.png' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'projects/pdf/suenos_de_colores.pdf', image: 'projects/suenos_de_colores_image.png' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'projects/pdf/floddets.pdf', image: 'projects/floddets_image.png' },
 ]
 
 const extensions: Extension[] = [
@@ -54,7 +55,7 @@ const clientLogos = [
   'logo_isdin.svg', 'logo_issey_miyake.svg', 'logo_kapturall.svg', 'logo_laliga.svg', 'logo_mahou.svg',
   'logo_microsoft.svg', 'logo_narciso_rodriguez.svg', 'logo_nars.svg', 'logo_naturgy.svg', 'logo_paradores.svg',
   'logo_peugeot.svg', 'logo_polestar.svg', 'logo_sandvik.svg', 'logo_santander.svg', 'logo_shiseido.svg',
-  'logo_telefonica.svg', 'logo_ule.svg', 'logo_universidad_europea.svg', 'logo_vicktor_and_rolf.svg',
+  'logo_telefonica.svg', 'logo_universidad_europea.svg', 'logo_vicktor_and_rolf.svg',
 ] as const
 
 const projectAreas: Record<string, string> = {
@@ -85,6 +86,8 @@ function TypeText({ text, className }: Readonly<{ text: string; className: strin
 }
 
 function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClose: () => void }>) {
+  const [view, setView] = useState<'figma' | 'pdf'>('figma')
+
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -103,10 +106,14 @@ function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClos
       <div className="project-viewer__panel">
         <header className="project-viewer__header">
           <h2 id="project-viewer-title"><span>{project.number}</span> / {project.title}</h2>
+          <div className="project-viewer__controls" aria-label={`${project.title} viewing options`}>
+            <button className={view === 'figma' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'figma'} onClick={() => setView('figma')}>Interactive prototype</button>
+            <button className={view === 'pdf' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'pdf'} onClick={() => setView('pdf')}>View case study</button>
+          </div>
           <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
         </header>
         <div className="project-viewer__frame">
-          <iframe src={project.figmaUrl} title={`${project.title} Figma design`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
+          {view === 'figma' ? <iframe src={project.figmaUrl} title={`${project.title} interactive prototype`} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <iframe className="project-viewer__pdf" src={`${import.meta.env.BASE_URL}${project.pdf}`} title={`${project.title} case study PDF`} loading="lazy" />}
         </div>
       </div>
     </div>
