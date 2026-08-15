@@ -556,6 +556,7 @@ function App() {
         portal
           .set(portalOverlay, { autoAlpha: 1, '--hero-portal': '2px' }, 0)
           .to(heroContent, { y: -32, autoAlpha: 0, duration: 0.36, ease: 'none', stagger: 0.015 }, 0)
+          .to(hero, { '--hero-grid-opacity': 0, duration: 0.28, ease: 'none' }, 0.16)
           .to(orb, { x: () => getOrbTarget().x, y: () => getOrbTarget().y, scale: 1.14, duration: 0.46, ease: 'none' }, 0)
           .to(orb, { scale: getOrbScale, autoAlpha: 0, duration: 0.58, ease: 'none' }, 0.42)
           .to(portalOverlay, { '--hero-portal': () => `${getPortalRadius()}px`, duration: 0.58, ease: 'none' }, 0.42)

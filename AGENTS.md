@@ -31,3 +31,7 @@ Read the relevant skill before editing. If a task spans multiple areas, use ever
 - Recommended title: `[ui-portfolio-2026] <Title>`.
 - Run `pnpm run lint`, `pnpm run build`, and `pnpm test` when available before opening a PR.
 - Keep animations accessible with `prefers-reduced-motion` and verify layouts on mobile.
+
+## Version control
+
+- Do not stage, commit, push, amend, rebase, or otherwise mutate Git history unless the owner explicitly requests it in the current message. Pelayo is the sole owner of commits for this repository.
