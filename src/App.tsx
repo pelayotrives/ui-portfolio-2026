@@ -164,7 +164,7 @@ function App() {
     const nav = document.querySelector<HTMLElement>('.site-nav')
     const scrollProgressFill = document.querySelector<HTMLElement>('.scroll-progress__fill')
     const rewindOverlay = document.querySelector<HTMLElement>('.rewind-overlay')
-    const rewindIcon = rewindOverlay?.querySelector<SVGElement>('.rewind-overlay__icon')
+    const rewindIcon = rewindOverlay?.querySelector<HTMLElement>('.rewind-overlay__icon')
     const setNavScrolled = (scrolled: boolean) => nav?.classList.toggle('site-nav--scrolled', scrolled)
     const updateScrollProgress = (scroll: number) => {
       const maximumScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
@@ -1078,10 +1078,10 @@ function App() {
     <div className="site-shell" ref={pageRef}>
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
       <div className="rewind-overlay" aria-hidden="true">
-        <svg className="rewind-overlay__icon" viewBox="0 0 64 64" aria-hidden="true">
-          <path d="M5 32 27 11v17h10L59 7v50L37 36H27v17L5 32Z" fill="currentColor" />
-          <path d="M55 10h5v44h-5z" fill="currentColor" />
-        </svg>
+        <div className="rewind-overlay__content">
+          <img className="rewind-overlay__icon" src={`${import.meta.env.BASE_URL}rewind-icon.svg`} alt="" aria-hidden="true" />
+          <span className="rewind-overlay__label">REWINDING...</span>
+        </div>
       </div>
       <div className="scroll-progress" role="progressbar" aria-label="Page scroll progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}><span className="scroll-progress__fill" /></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
