@@ -176,6 +176,9 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 .extension-card { flex: 0 0 min(calc((100vw - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3), calc((1440px - var(--space-lg) - var(--space-lg) - var(--extension-gap) - var(--extension-gap)) / 3)); display: grid; grid-template-columns: 1fr; grid-template-rows: auto 1fr; min-width: 0; min-height: 0; height: auto; padding: clamp(.7rem, 1vw, 1rem); border: 1px solid var(--color-line); border-radius: 1.8rem; background: rgba(255, 252, 242, .78); color: var(--color-ink); overflow: hidden; will-change: transform; transition: border-color .35s var(--ease-out), background .35s var(--ease-out), color .35s var(--ease-out); }
 .extension-card:hover { border-color: var(--color-accent-deep); background: var(--color-paper); }
 .extension-card:hover h4 { color: var(--color-accent-deep); }
+.extension-card__cta { transition: color .48s var(--ease-out); }
+.extension-card__cta .icon-arrow { transition: color .48s var(--ease-out), transform .3s var(--ease-out); }
+.extension-card:hover .extension-card__cta, .extension-card:hover .extension-card__cta .icon-arrow { color: var(--color-accent-deep); }
 .extension-card > img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 0; border: 1px solid rgba(64, 61, 57, .25); border-right: 1px solid rgba(64, 61, 57, .25); border-radius: 1.1rem; outline: 1px solid rgba(255, 252, 242, .8); outline-offset: -4px; object-fit: contain; object-position: center; background: var(--color-ink); }
 .extension-card__body { display: flex; flex-direction: column; min-width: 0; min-height: 0; padding: clamp(1rem, 1.35vw, 1.65rem) clamp(.45rem, .8vw, .9rem) .25rem; }
 .extension-card__meta { display: flex; align-items: center; color: var(--color-accent-deep); font: var(--text-micro); text-transform: uppercase; letter-spacing: .07em; }
