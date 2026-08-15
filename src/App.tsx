@@ -849,9 +849,8 @@ function App() {
       const aboutName = document.querySelector<HTMLElement>('.about-title__name')
       if (aboutName) {
         gsap.to(aboutName, {
-          color: 'rgba(37, 36, 34, 0)',
-          webkitTextStrokeWidth: '0.65px',
-          webkitTextStrokeColor: '#252422',
+          color: '#eb5e28',
+          webkitTextStrokeWidth: '0px',
           skewX: -11,
           ease: 'none',
           scrollTrigger: {

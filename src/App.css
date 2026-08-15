@@ -35,8 +35,8 @@ footer { display: flex; justify-content: space-between; gap: 1rem; padding: 1.4r
 .hero-orb__canvas { position: absolute; inset: -14%; width: 128%; height: 128%; overflow: visible; }
 .hero-orb__canvas canvas { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 
-/* The name starts solid and is progressively redrawn as a quiet outline. */
-.about-copy h2 .about-title__name { display: inline-block; color: var(--color-ink); font-style: normal; transform: skewX(0deg); -webkit-text-stroke: 0 transparent; paint-order: stroke fill; transform-origin: left center; will-change: color, transform, -webkit-text-stroke; }
+/* The name shifts from ink to orange with one restrained editorial slant. */
+.about-copy h2 .about-title__name { display: inline-block; color: var(--color-ink); font-style: normal; transform: skewX(0deg); -webkit-text-stroke: 0 transparent; paint-order: stroke fill; transform-origin: left center; will-change: color, transform; }
 
 @media (max-width: 700px) {
   .hero-orb__canvas { inset: -10%; width: 120%; height: 120%; }
@@ -128,6 +128,28 @@ footer .icon-arrow { margin-left: .3rem; vertical-align: -.2em; }
 @media (max-width: 700px) {
   .contact-section::before { background-size: 34px 34px; transform: perspective(700px) rotateX(54deg) scale(1.5) translateY(14%); }
   .contact-section > .contact-star { top: 31%; right: 5%; font-size: 7rem; }
+}
+
+@media (max-width: 700px) {
+  .project-card,
+  .project-card:nth-child(even) {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .project-card--2,
+  .project-card--4,
+  .project-card--5 {
+    margin-top: 0;
+  }
+
+  .project-card .artwork,
+  .project-card .artwork-skeleton {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 1 / 1;
+  }
 }
 
 /* Contact links: a pinned editorial index with a small ink-inversion lens. */
