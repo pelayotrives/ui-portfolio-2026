@@ -163,6 +163,8 @@ function App() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const nav = document.querySelector<HTMLElement>('.site-nav')
     const scrollProgressFill = document.querySelector<HTMLElement>('.scroll-progress__fill')
+    const rewindOverlay = document.querySelector<HTMLElement>('.rewind-overlay')
+    const rewindIcon = rewindOverlay?.querySelector<SVGElement>('.rewind-overlay__icon')
     const setNavScrolled = (scrolled: boolean) => nav?.classList.toggle('site-nav--scrolled', scrolled)
     const updateScrollProgress = (scroll: number) => {
       const maximumScroll = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
@@ -189,6 +191,8 @@ function App() {
     let disposeLoaderScene: (() => void) | undefined
     let disposeHeroOrbScene: (() => void) | undefined
     let heroOrbStart: gsap.core.Tween | undefined
+    let rewindTimeline: gsap.core.Timeline | undefined
+    let onBackToTop: ((event: MouseEvent) => void) | undefined
     let loaderCancelled = false
     let loaderFinished = false
     const media = gsap.matchMedia()
@@ -916,6 +920,45 @@ function App() {
       })
         .to('.contact-morph__current span', { opacity: 0, duration: 0.36, stagger: { each: 0.025, from: 'end' } })
         .to('.contact-morph__next span', { opacity: 1, duration: 0.42, stagger: 0.035 })
+
+      const backToTop = document.querySelector<HTMLAnchorElement>('[data-back-to-top]')
+      if (backToTop && rewindOverlay && rewindIcon) {
+        onBackToTop = (event) => {
+          event.preventDefault()
+          rewindTimeline?.kill()
+
+          if (prefersReducedMotion) {
+            lenis.scrollTo(0, { immediate: true, force: true })
+            window.scrollTo({ top: 0, behavior: 'auto' })
+            return
+          }
+
+          rewindOverlay.setAttribute('aria-hidden', 'false')
+          rewindOverlay.classList.add('rewind-overlay--active')
+          rewindTimeline = gsap.timeline({
+            defaults: { ease: 'power2.inOut' },
+            onComplete: () => {
+              rewindOverlay.classList.remove('rewind-overlay--active')
+              rewindOverlay.setAttribute('aria-hidden', 'true')
+            },
+          })
+            .set(rewindOverlay, { autoAlpha: 0 })
+            .set(rewindIcon, { autoAlpha: 0, scale: 0.52, x: 18, rotation: -16 })
+            .to(rewindOverlay, { autoAlpha: 1, duration: 0.14, ease: 'power2.out' })
+            .to(rewindIcon, { autoAlpha: 1, scale: 1, x: 0, rotation: 0, duration: 0.3, ease: 'back.out(1.7)' }, '-=.04')
+            .add(() => {
+              lenis.scrollTo(0, {
+                duration: 0.9,
+                easing: (value) => 1 - ((1 - value) ** 3),
+                lock: true,
+                force: true,
+              })
+            }, '+=.03')
+            .to(rewindIcon, { scale: 0.82, x: -10, duration: 0.72, ease: 'power2.inOut' }, '<')
+            .to(rewindOverlay, { autoAlpha: 0, duration: 0.3, ease: 'power2.in' }, '>-0.02')
+        }
+        backToTop.addEventListener('click', onBackToTop)
+      }
     }, pageRef)
 
     const cursor = document.querySelector<HTMLElement>('.cursor')
@@ -1025,6 +1068,8 @@ function App() {
       if (onOver) window.removeEventListener('pointerover', onOver)
       if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
       if (onContactLeave) contactSection?.removeEventListener('pointerleave', onContactLeave)
+      if (onBackToTop) document.querySelector<HTMLAnchorElement>('[data-back-to-top]')?.removeEventListener('click', onBackToTop)
+      rewindTimeline?.kill()
       contactLinkElements.forEach((link) => gsap.killTweensOf(link))
     }
   }, [])
@@ -1032,6 +1077,12 @@ function App() {
   return (
     <div className="site-shell" ref={pageRef}>
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
+      <div className="rewind-overlay" aria-hidden="true">
+        <svg className="rewind-overlay__icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path d="M5 32 27 11v17h10L59 7v50L37 36H27v17L5 32Z" fill="currentColor" />
+          <path d="M55 10h5v44h-5z" fill="currentColor" />
+        </svg>
+      </div>
       <div className="scroll-progress" role="progressbar" aria-label="Page scroll progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}><span className="scroll-progress__fill" /></div>
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b><Asterisk aria-hidden="true" /></b></div>
@@ -1109,7 +1160,7 @@ function App() {
 
         <section className="contact-section" aria-labelledby="contact-title"><div className="contact-star" aria-hidden="true"><Asterisk className="contact-star__icon" /></div><p className="contact-kicker">Have a good project?</p><div className="contact-title-wrap"><h2 id="contact-title">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2><h2 className="contact-title-glow" aria-hidden="true">Let’s make<br /><span className="contact-morph"><TypeText className="contact-morph__current" text="the right thing." /><TypeText className="contact-morph__next" text="the best." /></span></h2></div><a className="contact-button" href="https://www.linkedin.com/in/pelayo-trives-pozuelo/">Start a conversation <ArrowUpRight className="icon-arrow" aria-hidden="true" /></a></section>
       </main>
-      <footer><span>© 2026 Pelayo Trives</span><a href="#top">Back to top <ArrowUp className="icon-arrow" aria-hidden="true" /></a></footer>
+      <footer><span>© 2026 Pelayo Trives</span><a data-back-to-top href="#top">Back to top <ArrowUp className="icon-arrow" aria-hidden="true" /></a></footer>
       {selectedProject && <ProjectViewer project={selectedProject} onClose={() => setSelectedProject(null)} />}
     </div>
   )
