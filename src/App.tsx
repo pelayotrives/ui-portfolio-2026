@@ -106,6 +106,7 @@ function ClientMarquee() {
 
 function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view: 'figma' | 'pdf' }>) {
   const [loaded, setLoaded] = useState(false)
+  const loaderProgressRef = useRef<HTMLSpanElement>(null)
   const source = view === 'figma'
     ? project.figmaUrl
     : project.pdf.startsWith('http')
@@ -115,6 +116,38 @@ function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view
     ? source.replace(/\/view\?.*$/, '/preview')
     : source
   const title = view === 'figma' ? `${project.title} interactive prototype` : `${project.title} case study PDF`
+
+  useEffect(() => {
+    const progress = loaderProgressRef.current
+    if (!progress) return
+
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    gsap.set(progress, { scaleX: 0.08 })
+    const progressTween = prefersReducedMotion
+      ? undefined
+      : gsap.to(progress, { scaleX: 0.82, duration: 6, ease: 'power1.out' })
+    return () => {
+      progressTween?.kill()
+      gsap.killTweensOf(progress)
+    }
+  }, [embedSource])
+
+  const handleFrameLoad = () => {
+    const progress = loaderProgressRef.current
+    if (!progress) {
+      setLoaded(true)
+      return
+    }
+
+    gsap.killTweensOf(progress)
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    gsap.to(progress, {
+      scaleX: 1,
+      duration: prefersReducedMotion ? 0 : 0.42,
+      ease: 'power2.out',
+      onComplete: () => setLoaded(true),
+    })
+  }
 
   if (view === 'pdf' && project.className === 'project--suenos') {
     return (
@@ -130,13 +163,14 @@ function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view
   }
 
   return (
-    <div className={`project-viewer__media-shell${loaded ? ' project-viewer__media-shell--loaded' : ''}`}>
-      <div className="project-viewer__loader" role="status" aria-live="polite" aria-hidden={loaded}>
-        <span className="project-viewer__loader-label">Loading {view === 'pdf' ? 'case study' : 'prototype'}</span>
-        <span className="project-viewer__loader-bar" aria-hidden="true"><span /></span>
+      <div className={`project-viewer__media-shell${loaded ? ' project-viewer__media-shell--loaded' : ''}`}>
+        <div className="project-viewer__loader" role="status" aria-live="polite" aria-hidden={loaded}>
+          <span className="project-viewer__loader-label">Loading {view === 'pdf' ? 'case study' : 'prototype'}</span>
+          <span className="project-viewer__loader-bar" aria-hidden="true"><span ref={loaderProgressRef} /></span>
+          {view === 'pdf' && project.pdf.startsWith('http') && <a className="project-viewer__pdf-fallback-link project-viewer__loader-drive-link" href={source} target="_blank" rel="noreferrer">Open case study in Drive <ArrowUpRight aria-hidden="true" size={20} strokeWidth={1.8} /></a>}
+        </div>
+      <iframe src={embedSource} title={title} loading="eager" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={handleFrameLoad} />
       </div>
-      <iframe src={embedSource} title={title} loading="eager" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
-    </div>
   )
 }
 
