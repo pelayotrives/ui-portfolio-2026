@@ -98,7 +98,7 @@ function ClientMarquee() {
   return (
     <div className="client-marquee-region" aria-label="Clients I have worked with">
       <div className="client-marquee" aria-hidden="true">
-        <div className="client-marquee__track">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}logos/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div>
+        <div className="client-marquee__track">{[0, 1].map((group) => <div className="client-marquee__group" key={group}>{clientLogos.map((logo) => <span className="client-marquee__item" key={`${group}-${logo}`}><img src={`${import.meta.env.BASE_URL}clients/${logo}`} alt="" loading="lazy" decoding="async" /></span>)}</div>)}</div>
       </div>
     </div>
   )
@@ -1134,7 +1134,7 @@ function App() {
       <div className="intro-loader" aria-hidden="false"><div className="intro-loader__inner"><div className="intro-loader__messages"><p className="intro-loader__message">Getting the design in shape</p><p className="intro-loader__message">Loading the images</p><p className="intro-loader__message">Updating the experience</p></div><div className="intro-loader__canvas" aria-hidden="true" /><span className="intro-loader__count">Pelayo Trives | Product Engineer</span></div></div>
       <div className="rewind-overlay" aria-hidden="true">
         <div className="rewind-overlay__content">
-          <img className="rewind-overlay__icon" src={`${import.meta.env.BASE_URL}rewind-icon.svg`} alt="" aria-hidden="true" />
+          <img className="rewind-overlay__icon" src={`${import.meta.env.BASE_URL}ui/rewind-icon.svg`} alt="" aria-hidden="true" />
           <span className="rewind-overlay__label">REWINDING...</span>
         </div>
       </div>
@@ -1142,7 +1142,7 @@ function App() {
       <div className="cursor-trails" aria-hidden="true">{Array.from({ length: 9 }, (_, index) => <span className="cursor-trail" key={index} />)}</div>
       <div className="cursor" aria-hidden="true"><span /><b><Asterisk aria-hidden="true" /></b></div>
       <header className="site-nav" data-scroll-divider="bottom">
-        <div className="site-nav__brand"><a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top">PT<span>.</span></a></div>
+        <div className="site-nav__brand"><a className="wordmark" href="#top" aria-label="Pelayo Trives, back to top"><img src={`${import.meta.env.BASE_URL}brand/logo-signature.png`} alt="Pelayo Trives" /></a></div>
         <div className="site-nav__meta"><p className="nav-note">Product Engineer<br />based in Kyoto</p></div>
         <nav className="site-nav__actions" aria-label="Main navigation">
           <a href="#work">Selected work</a>
