@@ -213,14 +213,25 @@ function App() {
 
       event.preventDefault()
       window.history.pushState(null, '', hash)
-      lenis.scrollTo(target, prefersReducedMotion
-        ? { immediate: true, force: true }
-        : {
-          duration: 1.15,
-          easing: (value) => 1 - ((1 - value) ** 3),
+      const scrollToTarget = () => {
+        lenis.scrollTo(target, prefersReducedMotion
+          ? { immediate: true, force: true }
+          : {
+            duration: 1.15,
+            easing: (value) => 1 - ((1 - value) ** 3),
+            force: true,
+            onComplete: () => ScrollTrigger.update(),
+          })
+      }
+      const shouldReplayHero = hash === '#work' && !prefersReducedMotion && lenis.scroll > window.innerHeight * 0.75
+      if (shouldReplayHero) {
+        lenis.scrollTo(0, {
+          duration: 0.5,
+          easing: (value) => 1 - ((1 - value) ** 4),
           force: true,
-          onComplete: () => ScrollTrigger.update(),
+          onComplete: scrollToTarget,
         })
+      } else scrollToTarget()
     }
     navigationLinks.forEach((link) => link.addEventListener('click', onNavigationClick as EventListener))
     window.addEventListener('scroll', handleNativeScroll, { passive: true })
