@@ -41,11 +41,11 @@ type Extension = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'projects/pdf/octalea.pdf', image: 'projects/octalea_image.webp' },
-  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'projects/pdf/dealium.pdf', image: 'projects/dealium_image.webp' },
-  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'projects/pdf/accra.pdf', image: 'projects/accra_image.webp' },
-  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'projects/pdf/suenos_de_colores.pdf', image: 'projects/suenos_de_colores_image.webp' },
-  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'projects/pdf/floddets.pdf', image: 'projects/floddets_image.webp' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'https://f005.backblazeb2.com/file/pelayo-portfolio-pdfs-2026/octalea.pdf', image: 'projects/octalea_image.webp' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'https://f005.backblazeb2.com/file/pelayo-portfolio-pdfs-2026/dealium.pdf', image: 'projects/dealium_image.webp' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'https://f005.backblazeb2.com/file/pelayo-portfolio-pdfs-2026/accra.pdf', image: 'projects/accra_image.webp' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'https://f005.backblazeb2.com/file/pelayo-portfolio-pdfs-2026/suenos_de_colores.pdf', image: 'projects/suenos_de_colores_image.webp' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'https://f005.backblazeb2.com/file/pelayo-portfolio-pdfs-2026/floddets.pdf', image: 'projects/floddets_image.webp' },
 ]
 
 const extensions: Extension[] = [
@@ -106,7 +106,11 @@ function ClientMarquee() {
 
 function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view: 'figma' | 'pdf' }>) {
   const [loaded, setLoaded] = useState(false)
-  const source = view === 'figma' ? project.figmaUrl : `${import.meta.env.BASE_URL}${project.pdf}`
+  const source = view === 'figma'
+    ? project.figmaUrl
+    : project.pdf.startsWith('http')
+      ? project.pdf
+      : `${import.meta.env.BASE_URL}${project.pdf}`
   const title = view === 'figma' ? `${project.title} interactive prototype` : `${project.title} case study PDF`
 
   return (
@@ -121,7 +125,7 @@ function TypeText({ text, className }: Readonly<{ text: string; className: strin
 }
 
 function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClose: () => void }>) {
-  const [view, setView] = useState<'figma' | 'pdf'>('figma')
+  const [view, setView] = useState<'figma' | 'pdf'>('pdf')
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
@@ -142,8 +146,8 @@ function ProjectViewer({ project, onClose }: Readonly<{ project: Project; onClos
         <header className="project-viewer__header">
           <h2 id="project-viewer-title"><span>{project.number}</span> / {project.title}</h2>
           <div className="project-viewer__controls" aria-label={`${project.title} viewing options`}>
+            <button className={view === 'pdf' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'pdf'} onClick={() => setView('pdf')}>View file</button>
             <button className={view === 'figma' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'figma'} onClick={() => setView('figma')}>Prototype</button>
-            <button className={view === 'pdf' ? 'project-viewer__tab project-viewer__tab--active' : 'project-viewer__tab'} type="button" aria-pressed={view === 'pdf'} onClick={() => setView('pdf')}>Download</button>
           </div>
           <button className="project-viewer__close" type="button" onClick={onClose} aria-label={`Close ${project.title} viewer`}>Close <span>×</span></button>
         </header>
