@@ -130,9 +130,13 @@ function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view
   }
 
   return (
-    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true"><iframe className="project-viewer__preload-frame" src={embedSource} title={title} onLoad={() => setLoaded(true)} /></div>}>
-      <iframe src={embedSource} title={title} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
-    </Skeleton>
+    <div className={`project-viewer__media-shell${loaded ? ' project-viewer__media-shell--loaded' : ''}`}>
+      <div className="project-viewer__loader" role="status" aria-live="polite" aria-hidden={loaded}>
+        <span className="project-viewer__loader-label">Loading {view === 'pdf' ? 'case study' : 'prototype'}</span>
+        <span className="project-viewer__loader-bar" aria-hidden="true"><span /></span>
+      </div>
+      <iframe src={embedSource} title={title} loading="eager" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
+    </div>
   )
 }
 
