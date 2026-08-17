@@ -204,6 +204,25 @@ function App() {
     }
     lenis.on('scroll', ScrollTrigger.update)
     lenis.on('scroll', handleScroll)
+    const navigationLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('nav a[href="#work"], nav a[href="#about"]'))
+    const onNavigationClick = (event: MouseEvent) => {
+      const link = event.currentTarget as HTMLAnchorElement
+      const hash = link.getAttribute('href')
+      const target = hash ? document.querySelector<HTMLElement>(hash) : null
+      if (!hash || !target) return
+
+      event.preventDefault()
+      window.history.pushState(null, '', hash)
+      lenis.scrollTo(target, prefersReducedMotion
+        ? { immediate: true, force: true }
+        : {
+          duration: 1.15,
+          easing: (value) => 1 - ((1 - value) ** 3),
+          force: true,
+          onComplete: () => ScrollTrigger.update(),
+        })
+    }
+    navigationLinks.forEach((link) => link.addEventListener('click', onNavigationClick as EventListener))
     window.addEventListener('scroll', handleNativeScroll, { passive: true })
     updateScrollProgress(window.scrollY)
     gsap.ticker.add(updateLenis)
@@ -1089,6 +1108,7 @@ function App() {
       if (onWindowLeave) window.removeEventListener('pointerleave', onWindowLeave)
       if (onContactLeave) contactSection?.removeEventListener('pointerleave', onContactLeave)
       if (onBackToTop) document.querySelector<HTMLAnchorElement>('[data-back-to-top]')?.removeEventListener('click', onBackToTop)
+      if (onNavigationClick) navigationLinks.forEach((link) => link.removeEventListener('click', onNavigationClick as EventListener))
       rewindTimeline?.kill()
       contactLinkElements.forEach((link) => gsap.killTweensOf(link))
     }
