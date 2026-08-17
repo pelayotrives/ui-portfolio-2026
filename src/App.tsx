@@ -41,11 +41,11 @@ type Extension = {
 }
 
 const projects: Project[] = [
-  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'https://drive.google.com/file/d/1rMu_6g5S5mBEwHXxZWLP4881LgWm9t0T/preview', image: 'projects/octalea_image.webp' },
-  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'https://drive.google.com/file/d/1iPAf3D4B0ZdRZZMfVcoHBSUaQ7gL79FB/preview', image: 'projects/dealium_image.webp' },
-  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'https://drive.google.com/file/d/1SoE0WCFKcG6mj5Zct9km4AI47vrWcjCh/preview', image: 'projects/accra_image.webp' },
-  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'https://drive.google.com/file/d/1IitrzvKJhsHui39xp-3-D6YOVF4tULvm/preview', image: 'projects/suenos_de_colores_image.webp' },
-  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'https://drive.google.com/file/d/1OagLMRoreUcN4baDPx9tnSHCMvDd59ZG/preview', image: 'projects/floddets_image.webp' },
+  { number: '01', title: 'Octalea', year: '2026', note: 'A static studio site for AI development and automation.', className: 'project--octalea', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-5&embed-host=share', pdf: 'https://drive.google.com/file/d/1rMu_6g5S5mBEwHXxZWLP4881LgWm9t0T/view?usp=drive_link', image: 'projects/octalea_image.webp' },
+  { number: '02', title: 'Dealium', year: '2026', note: 'A tailored business consultancy for sharper decisions.', className: 'project--dealium', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1341&embed-host=share', pdf: 'https://drive.google.com/file/d/1iPAf3D4B0ZdRZZMfVcoHBSUaQ7gL79FB/view?usp=drive_link', image: 'projects/dealium_image.webp' },
+  { number: '03', title: 'Accra', year: '2025', note: 'A natural-products shop built for mindful browsing.', className: 'project--accra', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=1-1959&embed-host=share', pdf: 'https://drive.google.com/file/d/1SoE0WCFKcG6mj5Zct9km4AI47vrWcjCh/view?usp=drive_link', image: 'projects/accra_image.webp' },
+  { number: '04', title: 'Sueños de Colores', year: '2025', note: 'A warm digital home for an early-years nursery.', className: 'project--suenos', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=39-2&embed-host=share', pdf: 'https://drive.google.com/file/d/1IitrzvKJhsHui39xp-3-D6YOVF4tULvm/view?usp=drive_link', image: 'projects/suenos_de_colores_image.webp' },
+  { number: '05', title: 'Floddets', year: '2025', note: 'A handmade eyewear atelier for glasses and sunglasses.', className: 'project--floddets', figmaUrl: 'https://embed.figma.com/design/iDm8FZQwxA4wafq1K41uID/Portfolio?node-id=266-86&embed-host=share', pdf: 'https://drive.google.com/file/d/1OagLMRoreUcN4baDPx9tnSHCMvDd59ZG/view?usp=drive_link', image: 'projects/floddets_image.webp' },
 ]
 
 const extensions: Extension[] = [
@@ -111,11 +111,27 @@ function ProjectViewerFrame({ project, view }: Readonly<{ project: Project; view
     : project.pdf.startsWith('http')
       ? project.pdf
       : `${import.meta.env.BASE_URL}${project.pdf}`
+  const embedSource = view === 'pdf' && source.includes('drive.google.com/file/d/')
+    ? source.replace(/\/view\?.*$/, '/preview')
+    : source
   const title = view === 'figma' ? `${project.title} interactive prototype` : `${project.title} case study PDF`
 
+  if (view === 'pdf' && project.className === 'project--suenos') {
+    return (
+      <div className="project-viewer__pdf-fallback">
+        <p className="project-viewer__pdf-fallback-label">Large-format case study</p>
+        <h3>This PDF is too large for an embedded preview.</h3>
+        <p>Open it in Google Drive to download and review the complete case study.</p>
+        <a className="project-viewer__pdf-fallback-link" href={source} target="_blank" rel="noreferrer">
+          Open case study in Drive <ArrowUpRight aria-hidden="true" size={20} strokeWidth={1.8} />
+        </a>
+      </div>
+    )
+  }
+
   return (
-    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true"><iframe className="project-viewer__preload-frame" src={source} title={title} onLoad={() => setLoaded(true)} /></div>}>
-      {view === 'figma' ? <iframe src={source} title={title} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} /> : <iframe className="project-viewer__pdf" src={source} title={title} loading="lazy" onLoad={() => setLoaded(true)} />}
+    <Skeleton name={`project-viewer-${view}`} loading={!loaded} transition={260} className="project-viewer__media-shell" fallback={<div className="project-viewer__media-fallback" aria-hidden="true"><iframe className="project-viewer__preload-frame" src={embedSource} title={title} onLoad={() => setLoaded(true)} /></div>}>
+      <iframe src={embedSource} title={title} loading="lazy" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" onLoad={() => setLoaded(true)} />
     </Skeleton>
   )
 }
