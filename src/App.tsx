@@ -289,6 +289,7 @@ function App() {
       const canvasHost = document.querySelector<HTMLElement>('.intro-loader__canvas')
       const messages = gsap.utils.toArray<HTMLElement>('.intro-loader__message')
       const loaderProgress = { value: 0 }
+      const heroEntry = gsap.timeline({ paused: Boolean(loader && !prefersReducedMotion) })
       if (loader && canvasHost && !prefersReducedMotion) {
         void (async () => {
           try {
@@ -594,7 +595,7 @@ function App() {
         })() })
       }
       if (loader && !prefersReducedMotion) {
-        const loaderTimeline = gsap.timeline({ onComplete: () => loader.setAttribute('aria-hidden', 'true') })
+        const loaderTimeline = gsap.timeline({ onComplete: () => { loader.setAttribute('aria-hidden', 'true'); heroEntry.play(0) } })
         messages.forEach((message, index) => {
           loaderTimeline
             .fromTo(message, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: 'power3.out' }, index === 0 ? 0.15 : '+=0.18')
@@ -602,13 +603,16 @@ function App() {
             .to(loaderProgress, { value: (index + 1) / messages.length, duration: 0.65, ease: 'power2.inOut' }, '<-0.12')
         })
         loaderTimeline.to(loader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut' }, '+=0.08').call(() => { loaderFinished = true; disposeLoaderScene?.() })
-      } else if (loader) gsap.set(loader, { autoAlpha: 0 })
-      gsap.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
+      } else if (loader) {
+        gsap.set(loader, { autoAlpha: 0 })
+      }
+      heroEntry.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
         y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
       })
-      gsap.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
+      heroEntry.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
         yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
       })
+      if (!loader || prefersReducedMotion) heroEntry.play(0)
       media.add('(min-width: 1280px) and (prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector<HTMLElement>('.hero')
         const orb = hero?.querySelector<HTMLElement>('.hero-orb')
