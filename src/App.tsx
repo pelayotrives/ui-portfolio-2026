@@ -289,7 +289,7 @@ function App() {
       const canvasHost = document.querySelector<HTMLElement>('.intro-loader__canvas')
       const messages = gsap.utils.toArray<HTMLElement>('.intro-loader__message')
       const loaderProgress = { value: 0 }
-      const heroEntry = gsap.timeline({ paused: Boolean(loader && !prefersReducedMotion) })
+      const heroEntry = gsap.timeline()
       if (loader && canvasHost && !prefersReducedMotion) {
         void (async () => {
           try {
@@ -595,7 +595,7 @@ function App() {
         })() })
       }
       if (loader && !prefersReducedMotion) {
-        const loaderTimeline = gsap.timeline({ onComplete: () => { loader.setAttribute('aria-hidden', 'true'); heroEntry.play(0) } })
+        const loaderTimeline = gsap.timeline({ onComplete: () => loader.setAttribute('aria-hidden', 'true') })
         messages.forEach((message, index) => {
           loaderTimeline
             .fromTo(message, { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: 0.38, ease: 'power3.out' }, index === 0 ? 0.15 : '+=0.18')
@@ -612,7 +612,6 @@ function App() {
       heroEntry.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
         yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
       })
-      if (!loader || prefersReducedMotion) heroEntry.play(0)
       media.add('(min-width: 1280px) and (prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector<HTMLElement>('.hero')
         const orb = hero?.querySelector<HTMLElement>('.hero-orb')
