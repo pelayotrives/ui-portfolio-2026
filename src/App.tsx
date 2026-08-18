@@ -289,7 +289,6 @@ function App() {
       const canvasHost = document.querySelector<HTMLElement>('.intro-loader__canvas')
       const messages = gsap.utils.toArray<HTMLElement>('.intro-loader__message')
       const loaderProgress = { value: 0 }
-      const heroEntry = gsap.timeline()
       if (loader && canvasHost && !prefersReducedMotion) {
         void (async () => {
           try {
@@ -606,12 +605,6 @@ function App() {
       } else if (loader) {
         gsap.set(loader, { autoAlpha: 0 })
       }
-      heroEntry.from('.site-nav, .hero__eyebrow, .hero__aside, .hero__scroll', {
-        y: 28, opacity: 0, duration: 0.8, stagger: 0.08, ease: 'power3.out',
-      })
-      heroEntry.fromTo('.hero__title-line', { yPercent: 110, opacity: 0, filter: 'blur(14px)' }, {
-        yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: 0.8, stagger: 0.12, ease: 'power3.out',
-      })
       media.add('(min-width: 1280px) and (prefers-reduced-motion: no-preference)', () => {
         const hero = document.querySelector<HTMLElement>('.hero')
         const orb = hero?.querySelector<HTMLElement>('.hero-orb')
